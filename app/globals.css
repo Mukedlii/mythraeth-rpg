@@ -187,3 +187,71 @@ button{font:inherit;cursor:pointer}
 @media(prefers-reduced-motion:reduce){.mobile-nav button,.nav-item{transition:none}}
 
 undefined
+/* Reference-matched MYTHRAETH character + inventory HUD */
+.game-shell{min-height:100vh;background:#070a18 url('/heroes/warden.webp') center top/cover fixed no-repeat;}
+.game-shell:after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,#07091855,#080b19e8 58%,#070915f5)}
+.topbar{position:relative;z-index:2;height:76px;max-width:1500px;margin:0 auto;padding:7px 22px;display:grid;grid-template-columns:1fr 1fr 1.4fr;align-items:center;gap:14px;background:linear-gradient(180deg,#10172beF,#0a1020ed);border:0;border-bottom:1px solid #d5ad686b;box-shadow:0 6px 25px #000b}
+.topbar .player-chip{grid-column:1;grid-row:1;justify-self:start;margin:0;border:1px solid #d3a75e77;border-radius:4px;background:linear-gradient(100deg,#27334b,#101629);padding:5px 10px}
+.topbar .brand{grid-column:2;grid-row:1;justify-self:center;display:flex;justify-content:center;text-align:center;padding:0;border:0;background:none;color:#f7d58d}
+.topbar .brand-mark{display:none}
+.topbar .brand b{font:700 29px Cinzel,serif;letter-spacing:2px;color:#f7d58d;text-shadow:0 2px 2px #351b10,0 0 14px #f4c46a77}
+.topbar .brand small{display:block;color:#e5d4b0;font:700 8px Cinzel;letter-spacing:2px;margin-top:-2px}
+.topbar .resources{grid-column:3;grid-row:1;justify-self:end;display:flex;align-items:center;gap:7px}
+.topbar .resources span{display:flex;align-items:center;gap:6px;white-space:nowrap;padding:8px 10px;border:1px solid #bd965b99;border-radius:4px;background:linear-gradient(180deg,#25243a,#11182a);color:#fff1d2;font:700 10px Cinzel}
+.topbar .resources span svg:first-child{color:#ffd05c}.topbar .resources span:nth-child(2) svg:first-child{color:#d39aff}
+.hud-icon{width:30px;height:30px;border:1px solid #b58b51;border-radius:4px;background:linear-gradient(#333044,#111728);color:#e6c58b;font-size:17px}
+.game-layout{position:relative;z-index:1;display:block;max-width:1500px;min-height:calc(100vh - 76px);margin:0 auto;padding:12px 16px 95px}
+.sidebar{display:none!important}.content{padding:0!important;max-width:none;width:100%}.content-topline{display:none}
+.armory-screen{display:grid;grid-template-columns:minmax(260px,1.02fr) minmax(190px,.72fr) minmax(310px,1.16fr);grid-template-areas:"hero loadout inventory" "detail detail inventory";gap:12px;align-items:stretch;max-width:1360px;margin:0 auto}
+.armory-hero-panel,.armory-loadout,.armory-inventory,.armory-item-detail{position:relative;min-width:0;overflow:hidden;border:1px solid #b98e5d;border-radius:7px;background:linear-gradient(145deg,#17223aee,#0b1021f5);box-shadow:0 9px 24px #000a,inset 0 1px #fff3}
+.armory-hero-panel{grid-area:hero;min-height:390px;display:flex;flex-direction:column;justify-content:space-between;padding:13px;background:#0b1224}
+.armory-hero-backdrop{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 42% 34%,#4c7fc055,transparent 58%),linear-gradient(180deg,#101a2b 0%,#111b30 50%,#080d1a 100%)}
+.armory-hero-backdrop:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#08101b05 30%,#09101bd9 82%,#080c18 100%),linear-gradient(90deg,#0b102022,transparent 70%)}
+.armory-hero-backdrop img{width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:saturate(1.12) contrast(1.08);mix-blend-mode:screen;opacity:.94}
+.armory-hero-top,.armory-hero-info{position:relative;z-index:1}
+.armory-hero-top{display:flex;justify-content:space-between;align-items:flex-start}
+.vip-medal{padding:5px 9px;border:1px solid #e8c77d;border-radius:3px;background:linear-gradient(120deg,#5d3b20,#191426);color:#ffe2a1;font:900 9px Cinzel;box-shadow:0 2px 12px #0008}
+.armory-hero-info{padding:10px 4px 2px;text-shadow:0 2px 5px #000}
+.armory-hero-info .eyebrow{color:#f5d28e;font:800 9px Cinzel;letter-spacing:2px}
+.armory-hero-info h1{margin:2px 0 0;font:700 clamp(24px,3vw,34px) Cinzel,serif;color:#fff4d8}
+.armory-hero-info p{margin:2px 0 10px;color:#e5d6bc;font:700 11px Cinzel}
+.armory-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:8px 0 0;border-top:1px solid #e2c17c55}
+.armory-stats span{display:flex;align-items:center;gap:4px;color:#d4d7e3;font:700 8px Cinzel;white-space:nowrap}
+.armory-stats svg{width:14px;height:14px;color:#f3c66e}.armory-stats span:first-child svg{color:#f16b72}.armory-stats span:nth-child(3) svg{color:#79cfff}.armory-stats span:nth-child(4) svg{color:#80df9d}
+.armory-stats b{color:#fff;font-size:10px}
+.armory-loadout{grid-area:loadout;padding:12px;background:linear-gradient(145deg,#121c31f5,#0a1020f7)}
+.armory-section-heading{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid #d2a75a55;color:#f2d18f;font:800 9px Cinzel;letter-spacing:1.2px}
+.armory-section-heading b{display:flex;align-items:center;gap:7px;color:#d4d6e0;font-size:8px;letter-spacing:.3px}.armory-section-heading strong{font-size:20px;color:#f5d38b;text-shadow:0 0 10px #e4ad4c55}
+.armory-slot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.armory-slot{position:relative;min-width:0;aspect-ratio:1/1.03;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;overflow:hidden;border:2px solid #b38b51;border-radius:7px;background:radial-gradient(circle,#26334e,#0c1222 74%);box-shadow:inset 0 0 15px #000a,0 4px 10px #0008;padding:5px;color:#f5d28e}
+.armory-slot .gear-art{width:78%;height:75%;border:0;box-shadow:none;background-color:transparent}.armory-slot small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 7px Cinzel;color:#e6d9bd}.armory-slot>b{position:absolute;top:5px;right:6px;color:#fff1c1;font:800 8px Cinzel;text-shadow:0 1px 3px #000}
+.armory-slot.rare{border-color:#47b8ff}.armory-slot.epic{border-color:#b15dff}.armory-slot.legendary{border-color:#ffc65b;box-shadow:0 0 13px #dca64233,inset 0 0 16px #dca64222}.empty-slot-icon{height:74%;display:grid;place-items:center;color:#8e91a5}.empty-slot-icon svg{width:38px;height:38px}
+.auto-equip-wide{width:100%;margin-top:11px;justify-content:center;font-size:9px!important}
+.armory-inventory{grid-area:inventory;padding:10px;background:linear-gradient(145deg,#141b2df7,#090e1cf9)}
+.inventory-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid #bd965b66}
+.inventory-tabs button{display:flex;justify-content:center;align-items:center;gap:5px;padding:8px 3px;border:1px solid #7d718055;border-radius:4px;background:linear-gradient(#22263a,#111627);color:#bfc0cc;font:800 9px Cinzel}
+.inventory-tabs button.selected{border-color:#f0c46b;background:linear-gradient(180deg,#b77d2e,#55371e);color:#fff2c9;box-shadow:0 0 12px #e5ae4d44,inset 0 1px #fff7}
+.armory-item-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.armory-item{position:relative;min-width:0;aspect-ratio:1;display:grid;place-items:center;overflow:hidden;border:2px solid #77798a;border-radius:6px;background:radial-gradient(circle,#28324c,#0b1120 76%);padding:3px;box-shadow:inset 0 0 13px #000a,0 3px 7px #0008}
+.armory-item .gear-art{width:100%;height:100%;border:0;border-radius:3px;background-color:transparent;box-shadow:none}.armory-item.selected{outline:2px solid #ffe18d;outline-offset:1px;box-shadow:0 0 16px #f3c66c88,inset 0 0 15px #f3c66c44}
+.armory-item.rare{border-color:#48bfff}.armory-item.epic{border-color:#c25cff}.armory-item.legendary{border-color:#ffc65a;background:radial-gradient(circle,#59401f,#171323 75%)}.armory-item.common{border-color:#858a9b}
+.item-stars{position:absolute;bottom:2px;left:0;right:0;text-align:center;color:#ffd46c;font-size:8px;letter-spacing:-1px;text-shadow:0 1px 3px #000}
+.rarity-legend{display:flex;align-items:center;justify-content:space-between;gap:3px;flex-wrap:wrap;margin-top:10px;padding:7px 5px;border:1px solid #a68a5b66;border-radius:4px;background:#090e1c;color:#b9b7c1;font:700 7px Cinzel}
+.rarity-legend i{font-style:normal;color:#e5d4ae}.rarity-legend i:nth-of-type(2){color:#65caff}.rarity-legend i:nth-of-type(3){color:#d18aff}.rarity-legend i:nth-of-type(4){color:#ffd16b}
+.craft-panel{min-height:290px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:22px;color:#eee0c2}.craft-emblem{width:76px;height:76px;display:grid;place-items:center;border:1px solid #d3a85e;border-radius:50%;background:radial-gradient(circle,#573a69,#141326);color:#e8c27d;box-shadow:0 0 25px #c88dff33}.craft-panel h3{font:700 16px Cinzel}.craft-panel p{max-width:240px;color:#aeb3c3;font-size:10px;line-height:1.6}
+.armory-item-detail{grid-area:detail;display:grid;grid-template-columns:76px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 13px;background:linear-gradient(110deg,#161c2ff5,#090e1bf5);border-color:#b98c54}
+.detail-art{width:72px;height:72px;display:grid;place-items:center;border:2px solid #f1c15f;border-radius:6px;background:#161b2c;box-shadow:0 0 12px #e9b64d44}.detail-art .gear-art{width:100%;height:100%;border:0;background-color:transparent;box-shadow:none}
+.detail-copy{min-width:0}.detail-copy>small{font:800 8px Cinzel;letter-spacing:1px}.detail-copy h3{margin:4px 0;color:#ffe0a2;font:700 15px Cinzel}.detail-copy p{margin:0;color:#e3e1e2;font-size:9px;line-height:1.5}
+.detail-actions{display:flex;flex-direction:column;gap:5px;min-width:110px}.detail-actions .button{justify-content:center;padding:7px 9px;font-size:8px;min-height:29px}
+.mobile-nav{position:fixed;z-index:20;bottom:0;left:0;right:0;height:74px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));padding:5px 5px max(6px,env(safe-area-inset-bottom));border-top:2px solid #8e6b45;background:linear-gradient(180deg,#171b2af7,#080b17 80%);box-shadow:0 -7px 24px #000c}
+.mobile-nav:before{content:"";position:absolute;inset:3px 4px 4px;border:1px solid #c09a5c44;border-radius:5px;pointer-events:none}
+.mobile-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;border:1px solid transparent;border-radius:5px;background:transparent;color:#c0bdc9}
+.mobile-nav button svg{width:23px;height:23px;color:#d1b27d;filter:drop-shadow(0 2px 3px #000)}
+.mobile-nav button small{font:800 clamp(6px,1.2vw,9px) Cinzel;letter-spacing:.2px;white-space:nowrap}
+.mobile-nav button.active{border-color:#d6a858;background:linear-gradient(180deg,#60421f99,#17182c);color:#ffe2a1;box-shadow:inset 0 0 16px #e0ad4a33,0 0 12px #e0ad4a22}
+.mobile-nav button.active svg{color:#ffe08b;filter:drop-shadow(0 0 7px #ffcf6a)}
+@media(max-width:850px){.topbar{height:66px;padding:5px 9px;grid-template-columns:1fr auto 1.3fr;gap:5px}.topbar .brand b{font-size:20px}.topbar .brand small{font-size:6px}.topbar .player-chip{padding:4px 6px;gap:5px}.topbar .player-avatar{width:32px;height:32px}.topbar .player-chip b{font-size:8px}.topbar .player-chip small{font-size:7px}.topbar .resources{gap:3px}.topbar .resources span{padding:6px 6px;font-size:8px;gap:3px}.hud-icon{width:25px;height:25px;font-size:13px}.game-layout{padding:8px 9px 88px;min-height:calc(100vh - 66px)}.armory-screen{grid-template-columns:minmax(0,1fr) minmax(0,.82fr);grid-template-areas:"hero loadout" "inventory inventory" "detail detail";gap:8px}.armory-hero-panel{min-height:300px}.armory-loadout{padding:9px}.armory-inventory{padding:9px}.armory-item-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.armory-item-detail{grid-template-columns:58px minmax(0,1fr) auto;gap:8px;padding:8px}.detail-art{width:56px;height:56px}.detail-actions{min-width:88px}.detail-actions .button{font-size:7px;padding:6px}.mobile-nav{height:68px}}
+@media(max-width:480px){.topbar{grid-template-columns:auto 1fr auto}.topbar .brand b{font-size:15px;letter-spacing:1px}.topbar .brand small{font-size:5px;letter-spacing:1px}.topbar .player-chip{max-width:105px}.topbar .player-avatar{width:27px;height:27px}.topbar .player-chip b{font-size:7px}.topbar .player-chip small{font-size:6px}.topbar .resources span{font-size:7px;padding:5px 4px}.topbar .resources span svg{width:12px}.hud-icon{display:none}.armory-screen{grid-template-columns:1fr;grid-template-areas:"hero" "loadout" "inventory" "detail"}.armory-hero-panel{min-height:310px}.armory-loadout{padding:10px}.armory-slot-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.armory-slot{aspect-ratio:1/1.12;padding:3px}.armory-slot small{font-size:6px}.armory-slot>b{font-size:7px;top:3px;right:4px}.armory-slot .gear-art{width:90%;height:78%}.armory-section-heading{flex-direction:row;align-items:center;justify-content:space-between}.armory-section-heading strong{font-size:16px}.armory-item-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.armory-item{border-width:2px}.item-stars{font-size:7px}.armory-item-detail{grid-template-columns:50px minmax(0,1fr);gap:8px}.detail-art{width:48px;height:48px}.detail-copy h3{font-size:12px}.detail-copy p{font-size:8px}.detail-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);min-width:0}.detail-actions .button{font-size:7px}.mobile-nav{height:65px;padding:4px 2px max(5px,env(safe-area-inset-bottom))}.mobile-nav button{gap:2px}.mobile-nav button svg{width:19px;height:19px}.mobile-nav button small{font-size:6px;letter-spacing:0}}
+@media(min-width:1100px){.armory-screen{min-height:calc(100vh - 180px)}.armory-hero-panel{min-height:440px}.armory-inventory{min-height:420px}.armory-item-grid{gap:9px}.armory-item{max-height:116px}}
+@media(prefers-reduced-motion:reduce){.mobile-nav button,.armory-item,.armory-slot{transition:none}}
+.sprite-item{background-image:url('/items/fantasy-loot-atlas.webp');background-size:400% 400%;background-repeat:no-repeat;background-color:#10172a}
