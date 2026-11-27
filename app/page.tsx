@@ -54,6 +54,24 @@ function IconLabel({ icon, children }: { icon: React.ReactNode; children: React.
   return <span className="icon-label">{icon}{children}</span>;
 }
 
+function GearArt({ item, compact = false }: { item: Gear; compact?: boolean }) {
+  const variant = Array.from(item.id).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 3;
+  return <div className={`gear-art ${rarityClass[item.rarity]} ${compact ? "gear-art-compact" : ""} slot-${item.slot.toLowerCase()}`}>
+    <span className="gear-art-aura"/><svg viewBox="0 0 100 100" role="img" aria-label={item.name}>
+      <defs>
+        <linearGradient id={`metal-${item.id}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff2c5"/><stop offset=".35" stopColor="#b9c9e8"/><stop offset=".7" stopColor="#5b6d9d"/><stop offset="1" stopColor="#171c36"/></linearGradient>
+        <linearGradient id={`glow-${item.id}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff7c8"/><stop offset=".5" stopColor={item.rarity === "Legendary" ? "#ffb52e" : item.rarity === "Epic" ? "#c47aff" : item.rarity === "Rare" ? "#53c9ff" : "#b8c2d5"}/><stop offset="1" stopColor="#24365e"/></linearGradient>
+      </defs>
+      {item.slot === "Weapon" && <g transform={`rotate(${variant * 7 - 7} 50 50)`}><path d="M50 7 59 38 53 69 50 88 47 69 41 38Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="2.5"/><path d="M50 12 50 67" stroke="#fff4d2" strokeWidth="2"/><path d="M31 55 69 55 64 63 36 63Z" fill={`url(#glow-${item.id})`} stroke="#fff0bd" strokeWidth="2"/><path d="M46 64 54 64 55 82 45 82Z" fill="#76513d" stroke="#e9c58d" strokeWidth="2"/><circle cx="50" cy="86" r="5" fill={`url(#glow-${item.id})`}/></g>}
+      {item.slot === "Armor" && <g><path d="M30 19 42 11 50 17 58 11 70 19 83 32 73 47 69 82 50 91 31 82 27 47 17 32Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="3"/><path d="M42 13 50 29 58 13 66 25 61 47 50 56 39 47 34 25Z" fill="#273957" stroke="#f4d99a" strokeWidth="2"/><path d="M50 30 58 43 50 58 42 43Z" fill={`url(#glow-${item.id})`}/><path d="M29 51 42 58 38 80 28 72M71 51 58 58 62 80 72 72" fill="none" stroke="#e7c68c" strokeWidth="4"/></g>}
+      {item.slot === "Boots" && <g><path d="M27 13 53 13 55 49 73 59 83 75 78 87 18 87 15 77 30 65Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="3"/><path d="M29 17 50 17 49 51 31 63Z" fill="#273957" stroke="#e6d4ad" strokeWidth="2"/><path d="M31 63 71 63 80 76 20 76Z" fill={`url(#glow-${item.id})`} stroke="#f3d9a1" strokeWidth="2"/><path d="M31 30 49 30M31 40 49 40" stroke="#fff0c8" strokeWidth="3"/></g>}
+      {item.slot === "Necklace" && <g><path d="M22 18 Q50 75 78 18" fill="none" stroke={`url(#glow-${item.id})`} strokeWidth="5"/><path d="M50 56 66 70 50 92 34 70Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="3"/><path d="M50 61 59 71 50 83 41 71Z" fill={`url(#glow-${item.id})`}/><circle cx="22" cy="18" r="4" fill="#f7e5b3"/><circle cx="78" cy="18" r="4" fill="#f7e5b3"/></g>}
+      <path d={variant === 0 ? "M12 30 16 22 20 30 28 34 20 38 16 46 12 38 4 34Z" : variant === 1 ? "M78 8 81 17 90 20 81 23 78 32 75 23 66 20 75 17Z" : "M10 72 13 78 20 81 13 84 10 90 7 84 0 81 7 78Z"} fill="#fff1bc" opacity=".8"/>
+    </svg>
+    <span className="gear-art-rarity">{item.rarity === "Common" ? "N" : item.rarity === "Rare" ? "R" : item.rarity === "Epic" ? "E" : "L"}</span>
+  </div>;
+}
+
 function HeroArt({ hero, large = false }: { hero: Hero; large?: boolean }) {
   return <div className={`hero-art ${large ? "hero-art-large" : ""} ${rarityClass[hero.rarity]}`}>
     <img src={hero.image} alt={hero.name} />
@@ -152,6 +170,18 @@ export default function MythraethGame() {
     setEquipped(prev => ({ ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}), [item.slot]: item.id } }));
     showToast(`${item.name} equipped on ${activeHero.name}.`);
   };
+  const autoEquipBest = () => {
+    const nextSlots: Partial<Record<GearSlot, string>> = {};
+    for (const slot of gearSlots) {
+      const best = inventory.filter(item => item.slot === slot).sort((a, b) => {
+        const score = (g: Gear) => rarityRank[g.rarity] * 100 + g.hp * .8 + g.power * 1.4 + g.defense * 1.2 + g.luck;
+        return score(b) - score(a);
+      })[0];
+      if (best) nextSlots[slot] = best.id;
+    }
+    setEquipped(prev => ({ ...prev, [activeHeroId]: nextSlots }));
+    showToast("Best available equipment equipped.");
+  };
   const unequipGear = (slot: GearSlot) => { setEquipped(prev => { const next = { ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}) } }; delete next[activeHeroId][slot]; return next; }); showToast(`${slot} unequipped.`); };
 
   const startBattle = (enemy: Enemy) => {
@@ -239,11 +269,11 @@ export default function MythraethGame() {
         {activeTab === "Equipment" && <div className="equipment-view">
       <div className="page-heading"><div className="eyebrow"><Swords size={14}/> THE ARMOURY</div><h1>Hero <em>Equipment</em></h1><p>Equip relics, strengthen your champion and prepare for battle.</p></div>
       <div className="equipment-hero"><HeroArt hero={activeHero}/><div><span className={`rarity-text ${rarityClass[activeHero.rarity]}`}>{activeHero.rarity.toUpperCase()} CHAMPION</span><h2>{activeHero.name}</h2><p>{activeHero.className} · Level {activeHero.level}</p><div className="gear-statline"><span>HP <b>{activeHero.hp}</b></span><span>PWR <b>{activeHero.power}</b></span><span>DEF <b>{activeHero.defense}</b></span><span>LCK <b>{activeHero.luck}</b></span></div></div></div>
-      <div className="section-title"><div><span className="eyebrow">ACTIVE LOADOUT</span><h2>Equipped items</h2></div><span className="attempts">{activeGear.length} / 4 SLOTS FILLED</span></div>
-      <div className="equipped-grid">{gearSlots.map(slot => { const item = inventory.find(g => g.id === equipped[activeHeroId]?.[slot]); return <article className={`gear-card ${item ? rarityClass[item.rarity] : "empty"}`} key={slot}><div className="gear-slot-icon">{slot === "Weapon" ? <Swords/> : slot === "Armor" ? <Shield/> : slot === "Boots" ? <Zap/> : <Gem/>}</div><div><small>{slot.toUpperCase()}</small><b>{item ? item.name : "Empty slot"}</b><span>{item ? `${item.rarity === "Common" ? "NORMAL" : item.rarity.toUpperCase()} · ${gearBonusText(item)}` : "Choose an item below"}</span></div>{item && <button className="gear-action" onClick={() => unequipGear(slot)}>UNEQUIP</button>}</article>; })}</div>
+      <div className="section-title"><div><span className="eyebrow">ACTIVE LOADOUT</span><h2>Equipped items</h2></div><div className="loadout-actions"><span className="attempts">{activeGear.length} / 4 SLOTS FILLED</span><button className="button button-purple auto-equip" onClick={autoEquipBest}><Sparkles size={14}/> AUTO EQUIP</button></div></div>
+      <div className="equipped-grid">{gearSlots.map(slot => { const item = inventory.find(g => g.id === equipped[activeHeroId]?.[slot]); return <article className={`gear-card ${item ? rarityClass[item.rarity] : "empty"}`} key={slot}>{item ? <GearArt item={item} compact/> : <div className="gear-slot-icon">{slot === "Weapon" ? <Swords/> : slot === "Armor" ? <Shield/> : slot === "Boots" ? <Zap/> : <Gem/>}</div> }<div><small>{slot.toUpperCase()}</small><b>{item ? item.name : "Empty slot"}</b><span>{item ? `${item.rarity === "Common" ? "NORMAL" : item.rarity.toUpperCase()} · ${gearBonusText(item)}` : "Choose an item below"}</span></div>{item && <button className="gear-action" onClick={() => unequipGear(slot)}>UNEQUIP</button>}</article>; })}</div>
       <div className="section-title"><div><span className="eyebrow">YOUR TREASURE</span><h2>Equipment inventory</h2></div><span className="attempts">{inventory.length} ITEMS</span></div>
       <div className="filter-tabs gear-filters">{(["All", ...gearSlots] as const).map(slot => <button key={slot} className={gearFilter===slot?"selected":""} onClick={() => setGearFilter(slot)}>{slot}</button>)}</div>
-      <div className="gear-inventory">{inventory.filter(item => gearFilter === "All" || item.slot === gearFilter).map(item => { const isEquipped = equipped[activeHeroId]?.[item.slot] === item.id; const usedByOtherHero = Object.entries(equipped).some(([heroId, slots]) => heroId !== activeHeroId && Object.values(slots).includes(item.id)); return <article className={`gear-item ${rarityClass[item.rarity]}`} key={item.id}><div className="gear-item-top"><span className="gear-slot-label">{item.slot}</span><b className="rarity-text">{item.rarity === "Common" ? "NORMAL" : item.rarity.toUpperCase()}</b></div><h3>{item.name}</h3><p>{item.description}</p><div className="gear-bonuses">{item.hp>0&&<span>+{item.hp} HP</span>}{item.power>0&&<span>+{item.power} PWR</span>}{item.defense>0&&<span>+{item.defense} DEF</span>}{item.luck>0&&<span>+{item.luck} LCK</span>}</div><button className={`button ${isEquipped?"button-blue":"button-gold"}`} disabled={isEquipped || usedByOtherHero} onClick={() => equipGear(item)}>{isEquipped?"EQUIPPED":usedByOtherHero?"IN USE":`EQUIP ${item.slot.toUpperCase()}`}</button></article>; })}</div>
+      <div className="gear-inventory">{inventory.filter(item => gearFilter === "All" || item.slot === gearFilter).map(item => { const isEquipped = equipped[activeHeroId]?.[item.slot] === item.id; const usedByOtherHero = Object.entries(equipped).some(([heroId, slots]) => heroId !== activeHeroId && Object.values(slots).includes(item.id)); return <article className={`gear-item ${rarityClass[item.rarity]}`} key={item.id}><div className="gear-item-art"><GearArt item={item}/></div><div className="gear-item-top"><span className="gear-slot-label">{item.slot}</span><b className="rarity-text">{item.rarity === "Common" ? "NORMAL" : item.rarity.toUpperCase()}</b></div><h3>{item.name}</h3><p>{item.description}</p><div className="gear-bonuses">{item.hp>0&&<span>+{item.hp} HP</span>}{item.power>0&&<span>+{item.power} PWR</span>}{item.defense>0&&<span>+{item.defense} DEF</span>}{item.luck>0&&<span>+{item.luck} LCK</span>}</div><button className={`button ${isEquipped?"button-blue":"button-gold"}`} disabled={isEquipped || usedByOtherHero} onClick={() => equipGear(item)}>{isEquipped?"EQUIPPED":usedByOtherHero?"IN USE":`EQUIP ${item.slot.toUpperCase()}`}</button></article>; })}</div>
       <p className="gear-note">Victory in the Rune Arena grants a random equipment drop. Higher rarity items have stronger bonuses.</p>
     </div>}
 
