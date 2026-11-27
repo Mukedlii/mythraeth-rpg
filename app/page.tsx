@@ -173,7 +173,7 @@ export default function MythraethGame() {
   const autoEquipBest = () => {
     const nextSlots: Partial<Record<GearSlot, string>> = {};
     for (const slot of gearSlots) {
-      const best = inventory.filter(item => item.slot === slot).sort((a, b) => {
+      const best = inventory.filter(item => item.slot === slot && !Object.entries(equipped).some(([heroId, slots]) => heroId !== activeHeroId && Object.values(slots).includes(item.id))).sort((a, b) => {
         const score = (g: Gear) => rarityRank[g.rarity] * 100 + g.hp * .8 + g.power * 1.4 + g.defense * 1.2 + g.luck;
         return score(b) - score(a);
       })[0];
