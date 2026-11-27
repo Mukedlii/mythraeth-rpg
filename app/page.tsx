@@ -79,7 +79,7 @@ function gearSprite(item: Gear) {
 }
 function GearArt({ item, compact = false }: { item: Gear; compact?: boolean }) {
   const sprite = gearSprite(item);
-  return <RarityFrame rarity={item.rarity} ariaLabel={item.name} className={`gear-art sprite-item ${compact ? "gear-art-compact" : ""}`}><span className="gear-art-rarity">{item.rarity === "Common" ? "N" : item.rarity === "Rare" ? "R" : item.rarity === "Epic" ? "E" : item.rarity === "Legendary" ? "L" : "M"}</span></RarityFrame>;
+  return <RarityFrame rarity={item.rarity} ariaLabel={item.name} className={`gear-art sprite-item ${compact ? "gear-art-compact" : ""}`} style={{ backgroundPosition: `${(sprite % 4) * 33.333}% ${Math.floor(sprite / 4) * 33.333}%` }}><span className="gear-art-rarity">{item.rarity === "Common" ? "N" : item.rarity === "Rare" ? "R" : item.rarity === "Epic" ? "E" : item.rarity === "Legendary" ? "L" : "M"}</span></RarityFrame>;
 }
 
 function HeroArt({ hero, large = false }: { hero: Hero; large?: boolean }) {
