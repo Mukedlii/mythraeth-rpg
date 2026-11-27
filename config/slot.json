@@ -1,0 +1,59 @@
+{
+  "grid": { "reels": 5, "rows": 3 },
+  "run": {
+    "waves": 10,
+    "bossWaves": [5, 10],
+    "spinsPerWave": 4,
+    "startDist": 4,
+    "keepHp": 100,
+    "rerolls": 2,
+    "rerollsPerWave": 1,
+    "overtimeSpins": 3,
+    "maxAlliesPerLane": 5,
+    "lanes": 3
+  },
+  "multipliers": { "3": 1, "4": 2.5, "5": 6 },
+  "synergyBonus": 0.25,
+  "symbols": {
+    "blade":  { "name": "Rune Blade",   "weight": 20, "kind": "strike", "value": 16 },
+    "arrow":  { "name": "Volley",       "weight": 16, "kind": "volley", "value": 7 },
+    "bolt":   { "name": "Chain Bolt",   "weight": 12, "kind": "chain",  "value": 9, "targets": 3 },
+    "shield": { "name": "Aegis",        "weight": 12, "kind": "heal",   "value": 7 },
+    "coin":   { "name": "Gold Rune",    "weight": 14, "kind": "gold",   "value": 10 },
+    "trap":   { "name": "Snare",        "weight": 11, "kind": "trap",   "value": 24 },
+    "summon": { "name": "Spirit Guard", "weight": 9,  "kind": "summon", "value": 5 },
+    "wild":   { "name": "Wild Rune",    "weight": 6,  "kind": "wild",   "value": 0 }
+  },
+  "enemies": {
+    "baseHp": 20,
+    "hpGrowth": 1.17,
+    "baseCount": 2,
+    "countGrowth": 0.4,
+    "baseDamage": 5,
+    "damageGrowth": 1.09,
+    "bossHpMult": 7,
+    "bossDamage": 22,
+    "killGold": 4
+  },
+  "classBonus": {
+    "Warrior":  { "blade": 8, "shield": 3 },
+    "Mage":     { "bolt": 8, "wild": 2 },
+    "Assassin": { "blade": 5, "trap": 5 },
+    "Guardian": { "shield": 8, "summon": 3 },
+    "Ranger":   { "arrow": 8, "trap": 3 }
+  },
+  "upgrades": [
+    { "id": "sharp_runes",  "name": "Sharpened Runes",  "type": "damage",    "value": 0.15 },
+    { "id": "deep_pockets", "name": "Deep Pockets",     "type": "gold",      "value": 0.5 },
+    { "id": "extra_spin",   "name": "Extra Spin",       "type": "spin",      "value": 1 },
+    { "id": "reroll_pack",  "name": "Hold Tokens",      "type": "reroll",    "value": 2 },
+    { "id": "keep_walls",   "name": "Reinforced Keep",  "type": "keep",      "value": 30 },
+    { "id": "more_wilds",   "name": "Wild Surge",       "type": "weight",    "symbol": "wild",   "value": 5 },
+    { "id": "more_blades",  "name": "Blade Cult",       "type": "weight",    "symbol": "blade",  "value": 8 },
+    { "id": "more_bolts",   "name": "Storm Cult",       "type": "weight",    "symbol": "bolt",   "value": 8 },
+    { "id": "more_summons", "name": "Spirit Pact",      "type": "weight",    "symbol": "summon", "value": 7 },
+    { "id": "more_traps",   "name": "Trapper's Craft",  "type": "weight",    "symbol": "trap",   "value": 7 },
+    { "id": "big_five",     "name": "Jackpot Rune",     "type": "fiveBonus", "value": 0.75 },
+    { "id": "thin_reels",   "name": "Thin the Reels",   "type": "weight",    "symbol": "coin",   "value": -8 }
+  ]
+}
