@@ -380,3 +380,5 @@ undefined
 }
 @media(prefers-reduced-motion:reduce){.fusion-open-link,.currency-pill>button{transition:none}}
 @media(max-width:480px){.topbar{padding-top:max(7px,env(safe-area-inset-top));}.game-shell{padding-bottom:env(safe-area-inset-bottom)}}
+
+.inventory-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
