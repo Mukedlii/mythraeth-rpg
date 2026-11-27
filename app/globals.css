@@ -254,7 +254,7 @@ undefined
 @media(max-width:480px){.topbar{grid-template-columns:auto 1fr auto}.topbar .brand b{font-size:15px;letter-spacing:1px}.topbar .brand small{font-size:5px;letter-spacing:1px}.topbar .player-chip{max-width:105px}.topbar .player-avatar{width:27px;height:27px}.topbar .player-chip b{font-size:7px}.topbar .player-chip small{font-size:6px}.topbar .resources span{font-size:7px;padding:5px 4px}.topbar .resources span svg{width:12px}.hud-icon{display:none}.armory-screen{grid-template-columns:1fr;grid-template-areas:"hero" "loadout" "inventory" "detail"}.armory-hero-panel{min-height:310px}.armory-loadout{padding:10px}.armory-slot-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.armory-slot{aspect-ratio:1/1.12;padding:3px}.armory-slot small{font-size:6px}.armory-slot>b{font-size:7px;top:3px;right:4px}.armory-slot .gear-art{width:90%;height:78%}.armory-section-heading{flex-direction:row;align-items:center;justify-content:space-between}.armory-section-heading strong{font-size:16px}.armory-item-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.armory-item{border-width:2px}.item-stars{font-size:7px}.armory-item-detail{grid-template-columns:50px minmax(0,1fr);gap:8px}.detail-art{width:48px;height:48px}.detail-copy h3{font-size:12px}.detail-copy p{font-size:8px}.detail-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);min-width:0}.detail-actions .button{font-size:7px}.mobile-nav{height:65px;padding:4px 2px max(5px,env(safe-area-inset-bottom))}.mobile-nav button{gap:2px}.mobile-nav button svg{width:19px;height:19px}.mobile-nav button small{font-size:6px;letter-spacing:0}}
 @media(min-width:1100px){.armory-screen{min-height:calc(100vh - 180px)}.armory-hero-panel{min-height:440px}.armory-inventory{min-height:420px}.armory-item-grid{gap:9px}.armory-item{max-height:116px}}
 @media(prefers-reduced-motion:reduce){.mobile-nav button,.armory-item,.armory-slot{transition:none}}
-.sprite-item{background-image:url('/items/fantasy-loot-atlas.webp');background-size:400% 400%;background-repeat:no-repeat;background-color:#10172a}
+.sprite-item{background-image:url('/assets/gear-rarity-atlas.svg');background-size:400% 400%;background-repeat:no-repeat;background-color:#10172a}
 
 .hud-rank{position:absolute;right:22px;bottom:2px;display:flex;align-items:center;gap:6px;padding:4px 11px;border:1px solid #d5ad68;border-radius:4px;background:linear-gradient(180deg,#64451f,#211a24);color:#ffe3a3;font:800 8px Cinzel;box-shadow:inset 0 1px #fff5,0 2px 6px #0008}.hud-rank svg{color:#ffd36b}@media(max-width:850px){.hud-rank{right:10px;bottom:0;padding:3px 7px;font-size:7px}}@media(max-width:480px){.hud-rank{display:none}}
 
@@ -311,3 +311,72 @@ undefined
  .fusion-materials{max-height:235px}
 }
 @media(prefers-reduced-motion:reduce){.nav-item,.mobile-nav button{transition:none}}
+
+
+/* Phase 1 — mockup-matched MYTHRAETH HUD */
+.topbar{grid-template-columns:minmax(170px,1fr) minmax(230px,1.1fr) minmax(280px,1.4fr);gap:12px;padding-inline:clamp(10px,2vw,24px)}
+.topbar .brand b{font-size:clamp(17px,2vw,27px);letter-spacing:1.6px}
+.topbar .brand small{font-size:8px;letter-spacing:1.7px}
+.topbar .player-chip{border-radius:5px;position:relative;padding-right:48px}
+.vip-tag{position:absolute;right:5px;bottom:5px;display:inline-flex;align-items:center;gap:2px;padding:3px 5px;border:1px solid #e8c77d;border-radius:3px;background:linear-gradient(120deg,#765021,#302034);color:#ffe7a7;font:800 7px Cinzel;letter-spacing:.3px;font-style:normal}
+.resources{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.currency-pill{display:flex!important;align-items:center;gap:0!important;min-width:0;padding:0!important;overflow:hidden}
+.currency-value{display:flex;align-items:center;gap:5px;padding:7px 8px;border:0!important;background:transparent!important;box-shadow:none!important;color:#fff0d0;font:800 9px Cinzel;white-space:nowrap}
+.currency-gold .currency-value svg{color:#ffd05c}.currency-gems .currency-value svg{color:#d39aff}
+.currency-pill>button{width:24px;height:29px;display:grid;place-items:center;border:0;border-left:1px solid #bd965b66;background:#c08a3b22;color:#ffe4a0}
+.currency-pill>button:hover{background:#d6a64b44}
+.hud-icon{display:grid;place-items:center;flex:none}
+.rankings-shortcut{color:#ffe0a0}
+.game-panel{min-width:0}
+.armory-section-heading{display:grid;grid-template-columns:1fr auto;align-items:center;gap:7px}
+.gear-power-readout{display:grid;grid-template-columns:auto auto;align-items:center;column-gap:7px;text-align:right}
+.gear-power-readout>small{grid-column:1/-1;color:#d4d6e0;font:800 7px Cinzel;letter-spacing:1px}
+.gear-power-readout>strong{font:800 17px Cinzel;color:#f5d38b;text-shadow:0 0 10px #e4ad4c55}
+.gear-power-readout>em{font:700 7px Manrope;color:#8ee0b6;font-style:normal;white-space:nowrap}
+.item-slot{position:relative;min-width:0;aspect-ratio:1/1.03;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;overflow:hidden;border:2px solid #b38b51;border-radius:7px;background:radial-gradient(circle,#26334e,#0c1222 74%);box-shadow:inset 0 0 15px #000a,0 4px 10px #0008;padding:5px;color:#f5d28e}
+.item-slot small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 7px Cinzel;color:#e6d9bd}
+.item-slot>b{position:absolute;top:5px;right:6px;color:#fff1c1;font:800 8px Cinzel;text-shadow:0 1px 3px #000}
+.item-slot .gear-art{width:78%;height:75%;border:0;box-shadow:none;background-color:transparent}
+.item-slot.rare{border-color:#47b8ff}.item-slot.epic{border-color:#b15dff}.item-slot.legendary{border-color:#ffc65b;box-shadow:0 0 13px #dca64233,inset 0 0 16px #dca64222}.item-slot.mythic{border-color:#ff658e;box-shadow:0 0 15px #ff3d8d33}
+.item-slot.empty .empty-slot-icon{height:74%;display:grid;place-items:center;color:#8e91a5}
+.star-rating{display:inline-flex;gap:0;color:#ffd46c;font-size:8px;letter-spacing:-1px;text-shadow:0 1px 3px #000}
+.item-stars .star-rating{font-size:8px}
+.quest-badge{position:absolute;top:4px;right:calc(50% - 23px);width:15px;height:15px;display:grid;place-items:center;border:1px solid #ffd1d1;border-radius:50%;background:linear-gradient(145deg,#ff5555,#9d111d);color:#fff;font:900 8px Manrope;font-style:normal;box-shadow:0 0 10px #ff333388}
+.quest-badge-inline{position:static;margin-left:auto;flex:none}
+.fusion-open-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin:2px 0 8px;padding:7px 10px;border:1px solid #bb8bdb88;border-radius:4px;background:linear-gradient(100deg,#38234f,#19172b);color:#e5c6ff;font:800 8px Cinzel;letter-spacing:.6px}
+.fusion-open-link:hover{border-color:#e0b7ff;background:#4b2d67}
+.game-button{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.rarity-frame{position:relative}
+.rarity-legend i:nth-of-type(5){color:#ff83b3}
+@media(max-width:850px){
+ .topbar{grid-template-columns:minmax(120px,1fr) auto minmax(0,1.4fr);gap:5px;padding-inline:8px}
+ .topbar .brand b{font-size:17px}.topbar .brand small{font-size:6px}
+ .topbar .player-chip{padding:4px 42px 4px 6px}.topbar .player-avatar{width:32px;height:32px}
+ .resources{gap:3px}.currency-value{font-size:8px;padding:6px 5px;gap:3px}.currency-pill>button{width:19px;height:26px}.hud-icon{width:25px;height:26px}
+}
+@media(max-width:480px){
+ .topbar{height:auto;min-height:100px;padding:7px 9px 8px;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"player brand" "resources resources";row-gap:7px;column-gap:7px;align-content:center}
+ .topbar .player-chip{grid-area:player;justify-self:start;margin:0;min-width:112px}
+ .topbar .brand{grid-area:brand;justify-self:end;min-width:0}
+ .topbar .brand b{font-size:16px;letter-spacing:1.2px}
+ .topbar .brand small{font-size:6px;letter-spacing:1px}
+ .topbar .resources{grid-area:resources;justify-self:center;justify-content:center;width:100%;gap:7px}
+ .currency-value{font-size:9px;padding:6px 9px;gap:5px}
+ .currency-pill>button{width:25px;height:27px}
+ .hud-icon{width:29px;height:28px}
+ .armory-section-heading{grid-template-columns:1fr auto}
+ .item-slot{aspect-ratio:1/1.12;padding:3px}
+ .item-slot small{font-size:6px}
+ .item-slot>b{font-size:7px;top:3px;right:4px}
+ .item-slot .gear-art{width:90%;height:78%}
+ .quest-badge{top:2px;right:calc(50% - 21px)}
+ .mobile-nav{grid-template-columns:repeat(8,minmax(0,1fr));height:68px;gap:1px;padding:4px 2px max(5px,env(safe-area-inset-bottom))}
+ .mobile-nav button{gap:2px;min-width:0}
+ .mobile-nav button svg{width:19px;height:19px}
+ .mobile-nav button small{font-size:clamp(5px,1.45vw,6px);letter-spacing:-.1px}
+ .mobile-nav .nav-icon-frame{width:29px;height:29px}
+ .gear-power-readout>strong{font-size:15px}
+ .gear-power-readout>em{font-size:6px}
+}
+@media(prefers-reduced-motion:reduce){.fusion-open-link,.currency-pill>button{transition:none}}
+@media(max-width:480px){.topbar{padding-top:max(7px,env(safe-area-inset-top));}.game-shell{padding-bottom:env(safe-area-inset-bottom)}}
