@@ -146,7 +146,12 @@ export default function MythraethGame() {
     const stats = slot === "Weapon" ? { hp: 0, power: main, defense: 0, luck: bonus } : slot === "Armor" ? { hp: main * 2, power: 0, defense: main, luck: 0 } : slot === "Boots" ? { hp: bonus, power: 0, defense: main, luck: bonus + 1 } : { hp: bonus, power: bonus, defense: 0, luck: main };
     return { id: `gear-${Date.now()}-${Math.random().toString(36).slice(2,7)}`, name, slot, rarity, ...stats, description: `${rarity} ${slot.toLowerCase()} recovered from the Rune Arena.` };
   };
-  const equipGear = (item: Gear) => {\n    const otherOwner = Object.entries(equipped).find(([heroId, slots]) => heroId !== activeHeroId && Object.values(slots).includes(item.id));\n    if (otherOwner) { showToast("This item is equipped by another hero."); return; }\n    setEquipped(prev => ({ ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}), [item.slot]: item.id } }));\n    showToast(`${item.name} equipped on ${activeHero.name}.`);\n  };
+  const equipGear = (item: Gear) => {
+    const otherOwner = Object.entries(equipped).find(([heroId, slots]) => heroId !== activeHeroId && Object.values(slots).includes(item.id));
+    if (otherOwner) { showToast("This item is equipped by another hero."); return; }
+    setEquipped(prev => ({ ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}), [item.slot]: item.id } }));
+    showToast(`${item.name} equipped on ${activeHero.name}.`);
+  };
   const unequipGear = (slot: GearSlot) => { setEquipped(prev => { const next = { ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}) } }; delete next[activeHeroId][slot]; return next; }); showToast(`${slot} unequipped.`); };
 
   const startBattle = (enemy: Enemy) => {
