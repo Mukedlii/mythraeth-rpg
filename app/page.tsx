@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { CurrencyPill, GameButton, ItemSlot, Panel, RarityFrame, StarRating } from "@/components/game-ui";
 import {
   Swords, Shield, Sparkles, Crown, Castle, ScrollText, Gem, Coins,
   Users, Trophy, ShoppingBag, Home, Flame, Heart, Zap, Star, X,
-  ChevronRight, Plus, LockKeyhole, CircleHelp, Menu, RotateCcw, Hammer, GitMerge, ArrowUpCircle, Check
+  ChevronRight, Plus, LockKeyhole, CircleHelp, Menu, RotateCcw, Hammer, GitMerge, ArrowUpCircle, Check, Settings
 } from "lucide-react";
 
 type Rarity = "Common" | "Rare" | "Epic" | "Legendary" | "Mythic";
@@ -46,11 +47,11 @@ const gearNames: Record<GearSlot, string[]> = {
 };
 
 const initialHeroes: Hero[] = [
-  { id: "warden", name: "Aldric Stormguard", title: "The Oathbound", className: "Warrior", rarity: "Legendary", level: 45, hp: 248, power: 82, defense: 76, luck: 31, image: "/heroes/warden.webp", color: "blue", element: "Storm" },
-  { id: "frost", name: "Vaelith", title: "Queen of the Frozen Veil", className: "Mage", rarity: "Epic", level: 38, hp: 174, power: 91, defense: 43, luck: 55, image: "/heroes/frost-queen.webp", color: "cyan", element: "Frost" },
-  { id: "demon", name: "Nyxara", title: "The Crimson Pact", className: "Assassin", rarity: "Epic", level: 36, hp: 156, power: 96, defense: 39, luck: 72, image: "/heroes/lich-king.webp", color: "red", element: "Shadow" },
-  { id: "angel", name: "Seraphine", title: "Dawn's Last Light", className: "Guardian", rarity: "Legendary", level: 40, hp: 232, power: 64, defense: 89, luck: 42, image: "/heroes/iron-warlord.webp", color: "gold", element: "Radiance" },
-  { id: "ranger", name: "Kaelen", title: "Whisper of the Wild", className: "Ranger", rarity: "Rare", level: 28, hp: 142, power: 73, defense: 41, luck: 66, image: "/heroes/warden.webp", color: "green", element: "Nature" }
+  { id: "warden", name: "Aldric Stormguard", title: "The Oathbound", className: "Warrior", rarity: "Legendary", level: 45, hp: 248, power: 82, defense: 76, luck: 31, image: "/assets/hero-aldric-stormguard.svg", color: "blue", element: "Storm" },
+  { id: "frost", name: "Vaelith", title: "Queen of the Frozen Veil", className: "Mage", rarity: "Epic", level: 38, hp: 174, power: 91, defense: 43, luck: 55, image: "/assets/hero-vaelith-frost-mage.svg", color: "cyan", element: "Frost" },
+  { id: "demon", name: "Nyxara", title: "The Crimson Pact", className: "Assassin", rarity: "Epic", level: 36, hp: 156, power: 96, defense: 39, luck: 72, image: "/assets/hero-nyxara-shadow-assassin.svg", color: "red", element: "Shadow" },
+  { id: "angel", name: "Seraphine", title: "Dawn's Last Light", className: "Guardian", rarity: "Legendary", level: 40, hp: 232, power: 64, defense: 89, luck: 42, image: "/assets/hero-seraphine-dawn-guardian.svg", color: "gold", element: "Radiance" },
+  { id: "ranger", name: "Kaelen", title: "Whisper of the Wild", className: "Ranger", rarity: "Rare", level: 28, hp: 142, power: 73, defense: 41, luck: 66, image: "/assets/hero-aldric-stormguard.svg", color: "green", element: "Nature" }
 ];
 
 const enemies: Enemy[] = [
@@ -78,7 +79,7 @@ function gearSprite(item: Gear) {
 }
 function GearArt({ item, compact = false }: { item: Gear; compact?: boolean }) {
   const sprite = gearSprite(item);
-  return <div role="img" aria-label={item.name} className={`gear-art sprite-item ${rarityClass[item.rarity]} ${compact ? "gear-art-compact" : ""}`} style={{ backgroundPosition: `${(sprite % 4) * 33.333}% ${Math.floor(sprite / 4) * 33.333}%` }}><span className="gear-art-rarity">{item.rarity === "Common" ? "N" : item.rarity === "Rare" ? "R" : item.rarity === "Epic" ? "E" : "L"}</span></div>;
+  return <RarityFrame rarity={item.rarity} ariaLabel={item.name} className={`gear-art sprite-item ${compact ? "gear-art-compact" : ""}`} style={{ backgroundPosition: `${(sprite % 4) * 33.333}% ${Math.floor(sprite / 4) * 33.333}%` }}><span className="gear-art-rarity">{item.rarity === "Common" ? "N" : item.rarity === "Rare" ? "R" : item.rarity === "Epic" ? "E" : item.rarity === "Legendary" ? "L" : "M"}</span></RarityFrame>;
 }
 
 function HeroArt({ hero, large = false }: { hero: Hero; large?: boolean }) {
@@ -121,6 +122,7 @@ export default function MythraethGame() {
   const activeGear = gearSlots.map(slot => inventory.find(item => item.id === equipped[activeHeroId]?.[slot])).filter((item): item is Gear => Boolean(item));
   const activeBonus = activeGear.reduce((sum, item) => ({ hp: sum.hp + item.hp, power: sum.power + item.power, defense: sum.defense + item.defense, luck: sum.luck + item.luck }), { hp: 0, power: 0, defense: 0, luck: 0 });
   const activeHero: Hero = { ...baseHero, hp: baseHero.hp + activeBonus.hp, power: baseHero.power + activeBonus.power, defense: baseHero.defense + activeBonus.defense, luck: baseHero.luck + activeBonus.luck };
+  const activeGearPower = activeGear.reduce((sum, item) => sum + item.power * 2 + item.defense + item.hp * .2 + item.luck, 0);
   const totalPower = useMemo(() => heroes.slice(0, 3).reduce((sum, h) => {
     const worn = equipped[h.id] || {};
     const bonus = Object.values(worn).reduce((b, id) => { const item = inventory.find(g => g.id === id); return item ? b + item.power + item.defense : b; }, 0);
@@ -158,7 +160,7 @@ export default function MythraethGame() {
     { label: "Arena", icon: <Swords size={19}/>, tab: "Arena" },
     { label: "Heroes", icon: <Shield size={18}/>, tab: "Heroes" },
     { label: "Dungeon", icon: <Castle size={18}/>, tab: "Dungeon" },
-    { label: "Quest", icon: <ScrollText size={18}/>, tab: "Quests" },
+    { label: "Quests", icon: <ScrollText size={18}/>, tab: "Quests" },
     { label: "Shop", icon: <ShoppingBag size={18}/>, tab: "Shop" },
     { label: "Guild", icon: <Users size={18}/>, tab: "Guild" },
     { label: "Rankings", icon: <Trophy size={18}/>, tab: "Rankings" }
@@ -301,16 +303,16 @@ export default function MythraethGame() {
   return <main className="game-shell">
     <div className="ambient ambient-one"/><div className="ambient ambient-two"/>
     <header className="topbar">
-      <div className="player-chip"><div className="player-avatar"><img src={activeHero.image} alt="Active hero"/></div><span><b>Lv. {activeHero.level}</b><small>Player123 · VIP 1</small></span></div>
+      <div className="player-chip"><div className="player-avatar"><img src={activeHero.image} alt="Active hero"/></div><span><b>Lv. {activeHero.level}</b><small>Player123</small></span><em className="vip-tag"><Crown size={10}/> VIP 1</em></div>
       <button className="brand" onClick={() => setActiveTab("Home")} aria-label="MYTHRAETH home"><span><b>MYTHRAETH</b><small>RISE OF THE RUNEBORN</small></span></button>
-      <div className="resources"><span><Coins size={16}/> {fmt(gold)} <Plus size={12}/></span><span><Gem size={16}/> {fmt(gems)} <Plus size={12}/></span><button className="hud-icon" onClick={()=>showToast("Settings are coming soon.")}>⚙</button><button className="hud-icon" onClick={()=>showToast("Settings are coming soon.")}>⚙</button></div><button className="hud-rank" onClick={()=>setActiveTab("Rankings")}><Trophy size={13}/> RANKINGS</button>
+      <div className="resources"><CurrencyPill kind="gold" value={fmt(gold)} onAdd={()=>showToast("Gold can be earned in the game.")}/><CurrencyPill kind="gems" value={fmt(gems)} onAdd={()=>showToast("Premium currency is not connected yet.")}/><button className="hud-icon" aria-label="Settings" onClick={()=>showToast("Settings are coming soon.")}><Settings size={15}/></button><button className="hud-icon rankings-shortcut" aria-label="Rankings" onClick={()=>setActiveTab("Rankings")}><Trophy size={15}/></button></div>
     </header>
 
     <div className="game-layout">
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <div className="realm-label"><span>✦</span> THE SHATTERED REALMS <span>✦</span></div>
         <div className="nav-section-label">ADVENTURE</div>
-        {nav.slice(0,5).map(item => <button key={item.tab} onClick={() => {setActiveTab(item.tab);setMenuOpen(false);}} className={`nav-item ${activeTab === item.tab ? "active" : ""}`}><span className="nav-icon-frame">{item.icon}</span><span className="nav-label">{item.label}</span>{activeTab === item.tab && <ChevronRight size={15}/>}</button>)}
+        {nav.slice(0,5).map(item => <button key={item.tab} onClick={() => {setActiveTab(item.tab);setMenuOpen(false);}} className={`nav-item ${activeTab === item.tab ? "active" : ""}`}><span className="nav-icon-frame">{item.icon}</span><span className="nav-label">{item.label}</span>{item.tab==="Quests"&&<i className="quest-badge quest-badge-inline">3</i>}{activeTab === item.tab && <ChevronRight size={15}/>}</button>)}
         <div className="nav-section-label nav-section-secondary">KINGDOM</div>
         {nav.slice(5).map(item => <button key={item.tab} onClick={() => {setActiveTab(item.tab);setMenuOpen(false);}} className={`nav-item ${activeTab === item.tab ? "active" : ""}`}><span className="nav-icon-frame">{item.icon}</span><span className="nav-label">{item.label}</span>{activeTab === item.tab && <ChevronRight size={15}/>}</button>)}
         <div className="sidebar-bottom"><div className="season-icon"><Flame size={18}/></div><div><b>Season of Embers</b><small>12 days remaining</small></div></div>
@@ -337,17 +339,17 @@ export default function MythraethGame() {
             <div className="armory-hero-info"><span className="eyebrow">YOUR CHAMPION</span><h1>{activeHero.name.split(" ")[0]}</h1><p>⚔ Lv. {activeHero.level} {activeHero.className}</p><div className="armory-stats"><span><Heart/> HP <b>{fmt(activeHero.hp * 13)}</b></span><span><Swords/> PWR <b>{fmt(activeHero.power * 10)}</b></span><span><Shield/> DEF <b>{fmt(activeHero.defense * 10)}</b></span><span><Sparkles/> LCK <b>{fmt(activeHero.luck * 10)}</b></span></div></div>
           </section>
           <section className="armory-loadout">
-            <div className="armory-section-heading"><span>CHAMPION GEAR</span><b>GEAR POWER <strong>{fmt(totalPower * 10)}</strong></b></div>
-            <div className="armory-slot-grid">{gearSlots.map(slot=>{const item=inventory.find(g=>g.id===equipped[activeHeroId]?.[slot]);return <button key={slot} className={`armory-slot ${item?rarityClass[item.rarity]:"empty"}`} onClick={()=>{if(item)setSelectedGearId(item.id);else setGearFilter(slot);}}>{item?<GearArt item={item}/>:<span className="empty-slot-icon">{slot==="Weapon"?<Swords/>:slot==="Armor"?<Shield/>:slot==="Boots"?<Zap/>:<Gem/>}</span>}<small>{item?.name||slot}</small>{item&&<b>+{rarityRank[item.rarity]*2}</b>}</button>})}</div>
-            <button className="button button-blue auto-equip-wide" onClick={autoEquipBest}><Shield size={14}/> AUTO EQUIP</button>
+            <div className="armory-section-heading"><span>CHAMPION GEAR</span><div className="gear-power-readout"><small>GEAR POWER</small><strong>{fmt(totalPower * 10 + activeGearPower)}</strong><em>+{fmt(activeGearPower)} equipped</em></div></div>
+            <div className="armory-slot-grid">{gearSlots.map(slot=>{const item=inventory.find(g=>g.id===equipped[activeHeroId]?.[slot]);return <ItemSlot key={slot} label={item?.name||slot} rarity={item?.rarity} level={item ? item.upgradeLevel || rarityRank[item.rarity]*2 : undefined} onClick={()=>{if(item)setSelectedGearId(item.id);else setGearFilter(slot);}}>{item?<GearArt item={item}/>:<span className="empty-slot-icon">{slot==="Weapon"?<Swords/>:slot==="Armor"?<Shield/>:slot==="Boots"?<Zap/>:<Gem/>}</span>}</ItemSlot>})}</div>
+            <GameButton className="button button-blue auto-equip-wide" onClick={autoEquipBest}><Shield size={14}/> AUTO EQUIP</GameButton>
           </section>
-          <section className="armory-inventory">
-            <div className="inventory-tabs">{(["Inventory","Craft","Fusion","Salvage"] as const).map(tab=><button key={tab} className={inventoryTab===tab?"selected":""} onClick={()=>{setInventoryTab(tab);if(tab!=="Fusion")setSelectedFusionIds([]);}}>{tab==="Inventory"?<ShoppingBag size={13}/>:tab==="Craft"?<Hammer size={13}/>:tab==="Fusion"?<GitMerge size={13}/>:<RotateCcw size={13}/>} {tab}</button>)}</div>
-            {inventoryTab==="Inventory"&&<><div className="armory-item-grid">{inventory.slice().reverse().map(item=><button key={item.id} className={`armory-item ${rarityClass[item.rarity]} ${selectedGearId===item.id?"selected":""}`} onClick={()=>setSelectedGearId(item.id)} title={`${item.name} · ${item.rarity}`}><GearArt item={item}/><span className="item-stars">{"★".repeat(Math.min(5,rarityRank[item.rarity]+1))}</span></button>)}</div><div className="rarity-legend"><span>Rarity:</span><i>◆ Normal</i><i>◆ Rare</i><i>◆ Epic</i><i>◆ Legendary</i></div></>}
-            {inventoryTab==="Craft"&&<div className="craft-panel"><div className="craft-emblem"><Hammer size={38}/></div><h3>Forge a new relic</h3><p>Choose the equipment slot, then forge a random rarity item for 900 gold.</p><div className="craft-slot-choices">{gearSlots.map(slot=><button key={slot} className={craftSlot===slot?"chosen":""} onClick={()=>setCraftSlot(slot)}>{slot==="Weapon"?<Swords/>:slot==="Armor"?<Shield/>:slot==="Boots"?<Zap/>:<Gem/>}<small>{slot}</small></button>)}</div><button className="button button-purple" onClick={craftGear} disabled={gold<900}>FORGE {craftSlot.toUpperCase()} · 900 <Coins size={14}/></button></div>}
-            {inventoryTab==="Fusion"&&<div className="fusion-panel"><div className="craft-emblem fusion-emblem"><GitMerge size={36}/></div><h3>Runic Fusion</h3><p>Choose three unequipped items with the same slot and rarity. They are consumed to create one item of the next rarity.</p><div className="fusion-selection-count"><b>{selectedFusionIds.length} / 3</b><span>materials selected</span></div><div className="fusion-materials">{inventory.filter(g=>g.rarity!=="Mythic"&&!Object.values(equipped).some(slots=>Object.values(slots).includes(g.id))&&(selectedFusionIds.length===0||(g.slot===inventory.find(x=>x.id===selectedFusionIds[0])?.slot&&g.rarity===inventory.find(x=>x.id===selectedFusionIds[0])?.rarity))).map(item=><button key={item.id} className={"fusion-material " + rarityClass[item.rarity] + (selectedFusionIds.includes(item.id)?" chosen":"")} onClick={()=>toggleFusionItem(item)}><GearArt item={item} compact/><span><b>{item.name}</b><small>{item.rarity} · {item.slot}</small></span>{selectedFusionIds.includes(item.id)&&<Check size={15}/>}</button>)}</div><button className="button button-purple fusion-action" disabled={selectedFusionIds.length!==3} onClick={fuseGear}><GitMerge size={15}/> FUSE THREE ITEMS</button></div>}
+          <Panel className="armory-inventory">
+            <div className="inventory-tabs">{(["Inventory","Craft","Salvage"] as const).map(tab=><button key={tab} className={inventoryTab===tab||(tab==="Craft"&&inventoryTab==="Fusion")?"selected":""} onClick={()=>{setInventoryTab(tab);if(tab!=="Craft")setSelectedFusionIds([]);}}>{tab==="Inventory"?<ShoppingBag size={13}/>:tab==="Craft"?<Hammer size={13}/>:<RotateCcw size={13}/>} {tab}</button>)}</div>
+            {inventoryTab==="Inventory"&&<><div className="armory-item-grid">{inventory.slice().reverse().map(item=><button key={item.id} className={`armory-item ${rarityClass[item.rarity]} ${selectedGearId===item.id?"selected":""}`} onClick={()=>setSelectedGearId(item.id)} title={`${item.name} · ${item.rarity}`}><GearArt item={item}/><span className="item-stars"><StarRating value={Math.min(5,rarityRank[item.rarity]+1)}/></span></button>)}</div><div className="rarity-legend"><span>Rarity:</span><i>◆ Common</i><i>◆ Rare</i><i>◆ Epic</i><i>◆ Legendary</i><i>◆ Mythic</i></div></>}
+            {inventoryTab==="Craft"&&<div className="craft-panel"><div className="craft-emblem"><Hammer size={38}/></div><h3>Forge a new relic</h3><p>Choose the equipment slot, then forge a random rarity item for 900 gold.</p><button className="fusion-open-link" onClick={()=>setInventoryTab("Fusion")}><GitMerge size={14}/> OPEN RUNIC FUSION</button><div className="craft-slot-choices">{gearSlots.map(slot=><button key={slot} className={craftSlot===slot?"chosen":""} onClick={()=>setCraftSlot(slot)}>{slot==="Weapon"?<Swords/>:slot==="Armor"?<Shield/>:slot==="Boots"?<Zap/>:<Gem/>}<small>{slot}</small></button>)}</div><button className="button button-purple" onClick={craftGear} disabled={gold<900}>FORGE {craftSlot.toUpperCase()} · 900 <Coins size={14}/></button></div>}
+            {inventoryTab==="Fusion"&&<div className="fusion-panel"><button className="fusion-open-link" onClick={()=>setInventoryTab("Craft")}>← BACK TO CRAFTING</button><div className="craft-emblem fusion-emblem"><GitMerge size={36}/></div><h3>Runic Fusion</h3><p>Choose three unequipped items with the same slot and rarity. They are consumed to create one item of the next rarity.</p><div className="fusion-selection-count"><b>{selectedFusionIds.length} / 3</b><span>materials selected</span></div><div className="fusion-materials">{inventory.filter(g=>g.rarity!=="Mythic"&&!Object.values(equipped).some(slots=>Object.values(slots).includes(g.id))&&(selectedFusionIds.length===0||(g.slot===inventory.find(x=>x.id===selectedFusionIds[0])?.slot&&g.rarity===inventory.find(x=>x.id===selectedFusionIds[0])?.rarity))).map(item=><button key={item.id} className={"fusion-material " + rarityClass[item.rarity] + (selectedFusionIds.includes(item.id)?" chosen":"")} onClick={()=>toggleFusionItem(item)}><GearArt item={item} compact/><span><b>{item.name}</b><small>{item.rarity} · {item.slot}</small></span>{selectedFusionIds.includes(item.id)&&<Check size={15}/>}</button>)}</div><button className="button button-purple fusion-action" disabled={selectedFusionIds.length!==3} onClick={fuseGear}><GitMerge size={15}/> FUSE THREE ITEMS</button></div>}
             {inventoryTab==="Salvage"&&<div className="craft-panel"><div className="craft-emblem"><RotateCcw size={38}/></div><h3>Salvage equipment</h3><p>Select an item from your inventory, then salvage it for gold. Equipped items are protected.</p><button className="button button-gold" disabled={!inventory.find(g=>g.id===selectedGearId)||Object.values(equipped).some(slots=>Object.values(slots).includes(selectedGearId))} onClick={()=>{const item=inventory.find(g=>g.id===selectedGearId);if(item)sellGear(item);}}>SALVAGE SELECTED</button></div>}
-          </section>
+          </Panel>
           <section className="armory-item-detail">{(()=>{const item=inventory.find(g=>g.id===selectedGearId)||inventory.find(g=>g.id==="stock-flameblade")||inventory[0];if(!item)return <span>Select an item from your inventory.</span>;const isEquipped=equipped[activeHeroId]?.[item.slot]===item.id;return <><div className="detail-art"><GearArt item={item}/></div><div className="detail-copy"><small className={`rarity-text ${rarityClass[item.rarity]}`}>{item.rarity.toUpperCase()} · {item.slot.toUpperCase()}</small><h3>{item.name} {item.upgradeLevel?"+ "+item.upgradeLevel:""}</h3><p>{gearBonusText(item)||item.description}</p><small className="upgrade-cost-label">UPGRADE LEVEL · +{item.upgradeLevel||0} / +10</small></div><div className="detail-actions"><button className="button button-blue" disabled={isEquipped} onClick={()=>equipGear(item)}><Shield size={13}/> {isEquipped?"EQUIPPED":"EQUIP"}</button><button className="button button-purple" disabled={(item.upgradeLevel||0)>=10} onClick={()=>upgradeGear(item)}><ArrowUpCircle size={13}/> UPGRADE · {fmt(rarityRank[item.rarity]*250*((item.upgradeLevel||0)+1))} G</button><button className="button button-gold" disabled={Object.values(equipped).some(slots=>Object.values(slots).includes(item.id))} onClick={()=>sellGear(item)}><Coins size={13}/> SELL</button></div></>;})()}</section>
         </div>}
 
@@ -367,7 +369,7 @@ export default function MythraethGame() {
       </section>
     </div>
 
-    <nav className="mobile-nav">{nav.map(item=><button key={item.tab} onClick={()=>setActiveTab(item.tab)} className={activeTab===item.tab?"active":""}><span className="nav-icon-frame">{item.icon}</span><small>{item.label}</small></button>)}</nav>
+    <nav className="mobile-nav" aria-label="Main navigation">{nav.map(item=><button key={item.tab} onClick={()=>setActiveTab(item.tab)} className={activeTab===item.tab?"active":""} aria-current={activeTab===item.tab?"page":undefined}><span className="nav-icon-frame">{item.icon}</span>{item.tab==="Quests"&&<i className="quest-badge" aria-label="3 new quests">3</i>}<small>{item.label}</small></button>)}</nav>
 
     {battleOpen && <div className="modal-backdrop"><section className="battle-modal"><button className="modal-close" onClick={()=>setBattleOpen(false)}><X/></button><div className="battle-title"><span className="eyebrow">RUNE ARENA · DUEL {turn}</span><h2>{battleHp>0&&enemyHp>0?"The Clash of Champions":enemyHp<=0?"VICTORY":"DEFEAT"}</h2></div><div className="battle-duel"><div className="duelist"><HeroArt hero={activeHero}/><b>{activeHero.name}</b><small>YOUR CHAMPION</small><div className="hp-track"><i style={{width:`${Math.max(0,battleHp/activeHero.hp*100)}%`}}/></div><small>{battleHp} / {activeHero.hp} HP</small></div><div className="versus">VS</div><div className="duelist enemy-duelist"><div className="enemy-battle-art"><img src={selectedEnemy.image} alt={selectedEnemy.name}/></div><b>{selectedEnemy.name}</b><small>ARENA OPPONENT</small><div className="hp-track enemy-hp"><i style={{width:`${Math.max(0,enemyHp/selectedEnemy.hp*100)}%`}}/></div><small>{enemyHp} / {selectedEnemy.hp} HP</small></div></div><div className="battle-log">{battleLog.map((line,i)=><p key={i}>{line}</p>)}</div>{battleHp>0&&enemyHp>0?<div className="battle-actions"><button disabled={busy} onClick={()=>takeTurn("strike")}><Swords/> STRIKE</button><button disabled={busy} onClick={()=>takeTurn("rune")}><Sparkles/> RUNE BURST</button><button disabled={busy} onClick={()=>takeTurn("guard")}><Shield/> GUARD</button></div>:<button className="button button-gold battle-end" onClick={()=>setBattleOpen(false)}>RETURN TO ARENA</button>}</section></div>}
     {toast && <div className="toast"><Sparkles size={16}/>{toast}</div>}
