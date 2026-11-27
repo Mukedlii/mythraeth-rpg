@@ -18,13 +18,13 @@ type Enemy = { id: string; name: string; epithet: string; level: number; hp: num
 const initialHeroes: Hero[] = [
   { id: "warden", name: "Aldric Stormguard", title: "The Oathbound", className: "Warrior", rarity: "Legendary", level: 45, hp: 248, power: 82, defense: 76, luck: 31, image: "/heroes/warden.webp", color: "blue", element: "Storm" },
   { id: "frost", name: "Vaelith", title: "Queen of the Frozen Veil", className: "Mage", rarity: "Epic", level: 38, hp: 174, power: 91, defense: 43, luck: 55, image: "/heroes/frost-queen.webp", color: "cyan", element: "Frost" },
-  { id: "demon", name: "Nyxara", title: "The Crimson Pact", className: "Assassin", rarity: "Epic", level: 36, hp: 156, power: 96, defense: 39, luck: 72, image: "/heroes/demon-queen.webp", color: "red", element: "Shadow" },
-  { id: "angel", name: "Seraphine", title: "Dawn's Last Light", className: "Guardian", rarity: "Legendary", level: 40, hp: 232, power: 64, defense: 89, luck: 42, image: "/heroes/light-angel.webp", color: "gold", element: "Radiance" },
+  { id: "demon", name: "Nyxara", title: "The Crimson Pact", className: "Assassin", rarity: "Epic", level: 36, hp: 156, power: 96, defense: 39, luck: 72, image: "/heroes/lich-king.webp", color: "red", element: "Shadow" },
+  { id: "angel", name: "Seraphine", title: "Dawn's Last Light", className: "Guardian", rarity: "Legendary", level: 40, hp: 232, power: 64, defense: 89, luck: 42, image: "/heroes/iron-warlord.webp", color: "gold", element: "Radiance" },
   { id: "ranger", name: "Kaelen", title: "Whisper of the Wild", className: "Ranger", rarity: "Rare", level: 28, hp: 142, power: 73, defense: 41, luck: 66, image: "/heroes/warden.webp", color: "green", element: "Nature" }
 ];
 
 const enemies: Enemy[] = [
-  { id: "gloomfang", name: "Gloomfang", epithet: "The Hollow Ravager", level: 32, hp: 188, power: 34, gold: 850, gems: 8, image: "/heroes/demon-queen.webp" },
+  { id: "gloomfang", name: "Gloomfang", epithet: "The Hollow Ravager", level: 32, hp: 188, power: 34, gold: 850, gems: 8, image: "/heroes/lich-king.webp" },
   { id: "frostborn", name: "The Frostborn", epithet: "Sentinel of the Shard", level: 35, hp: 216, power: 42, gold: 1100, gems: 10, image: "/heroes/frost-queen.webp" },
   { id: "dreadlord", name: "Dreadlord Varyn", epithet: "King Beneath the Mountain", level: 41, hp: 260, power: 51, gold: 1500, gems: 15, image: "/heroes/warden.webp" }
 ];
@@ -47,6 +47,7 @@ function HeroArt({ hero, large = false }: { hero: Hero; large?: boolean }) {
 
 export default function MythraethGame() {
   const [heroes, setHeroes] = useState<Hero[]>(initialHeroes);
+  const [loaded, setLoaded] = useState(false);
   const [activeHeroId, setActiveHeroId] = useState("warden");
   const [activeTab, setActiveTab] = useState("Arena");
   const [gold, setGold] = useState(245670);
@@ -79,12 +80,14 @@ export default function MythraethGame() {
         if (typeof save.summonCount === "number") setSummonCount(save.summonCount);
       }
     } catch { /* start with a clean save if local data is invalid */ }
+    setLoaded(true);
   }, []);
 
   useEffect(() => {
+    if (!loaded) return;
     try { localStorage.setItem("mythraeth-save-v1", JSON.stringify({ heroes, activeHeroId, gold, gems, summonCount })); }
     catch { /* local save is optional */ }
-  }, [heroes, activeHeroId, gold, gems, summonCount]);
+  }, [loaded, heroes, activeHeroId, gold, gems, summonCount]);
 
   const nav = [
     { label: "Home", icon: <Home size={18}/>, tab: "Home" },
@@ -130,8 +133,8 @@ export default function MythraethGame() {
     setGems(v => v - 300);
     const pool = [
       { name: "Mordane", title: "Ashen Spellblade", className: "Mage", image: "/heroes/frost-queen.webp", color: "cyan", element: "Frost" },
-      { name: "Vesper", title: "The Veil Walker", className: "Assassin", image: "/heroes/demon-queen.webp", color: "red", element: "Shadow" },
-      { name: "Elyra", title: "Keeper of First Light", className: "Guardian", image: "/heroes/light-angel.webp", color: "gold", element: "Radiance" },
+      { name: "Vesper", title: "The Veil Walker", className: "Assassin", image: "/heroes/lich-king.webp", color: "red", element: "Shadow" },
+      { name: "Elyra", title: "Keeper of First Light", className: "Guardian", image: "/heroes/iron-warlord.webp", color: "gold", element: "Radiance" },
       { name: "Thorne", title: "Wildheart Sentinel", className: "Ranger", image: "/heroes/warden.webp", color: "green", element: "Nature" }
     ];
     const found = pool[Math.floor(Math.random() * pool.length)];
@@ -166,7 +169,7 @@ export default function MythraethGame() {
         {activeTab === "Arena" && <div className="arena-view">
           <div className="arena-heading"><div><div className="eyebrow"><Swords size={14}/> THE RUNE ARENA</div><h1>Prove your <em>legend.</em></h1><p>Challenge the champions. Claim the runes. Rise above the realms.</p></div><div className="league-badge"><Crown/><span><b>GOLD LEAGUE</b><small>RANK #247</small></span></div></div>
           <div className="arena-hero-panel">
-            <div className="champion-visual"><img src="/heroes/warden.webp" alt="Aldric Stormguard"/><div className="champion-vignette"/><div className="champion-caption"><span>YOUR CHAMPION</span><h2>{activeHero.name}</h2><small>{activeHero.rarity} · {activeHero.className}</small></div></div>
+            <div className="champion-visual"><img src={activeHero.image} alt={activeHero.name}/><div className="champion-vignette"/><div className="champion-caption"><span>YOUR CHAMPION</span><h2>{activeHero.name}</h2><small>{activeHero.rarity} · {activeHero.className}</small></div></div>
             <div className="champion-stats"><div className="stat-label">SQUAD POWER <b>{fmt(totalPower)}</b></div><div className="power-meter"><span style={{width: `${Math.min(100,totalPower/7)}%`}}/></div><div className="stat-grid"><span><Heart/> HP <b>{activeHero.hp}</b></span><span><Zap/> PWR <b>{activeHero.power}</b></span><span><Shield/> DEF <b>{activeHero.defense}</b></span><span><Sparkles/> LCK <b>{activeHero.luck}</b></span></div><button className="button button-blue" onClick={() => setActiveTab("Heroes")}><Users size={17}/> EDIT YOUR SQUAD</button></div>
           </div>
           <div className="section-title"><div><span className="eyebrow">CHOOSE YOUR OPPONENT</span><h2>Champions of the Arena</h2></div><span className="attempts">DAILY ATTEMPTS <b>3 / 5</b></span></div>
