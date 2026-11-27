@@ -56,17 +56,60 @@ function IconLabel({ icon, children }: { icon: React.ReactNode; children: React.
 
 function GearArt({ item, compact = false }: { item: Gear; compact?: boolean }) {
   const variant = Array.from(item.id).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 3;
+  const accent = item.rarity === "Legendary" ? "#ffbd55" : item.rarity === "Epic" ? "#c58aff" : item.rarity === "Rare" ? "#69d7ff" : "#cbd2df";
   return <div className={`gear-art ${rarityClass[item.rarity]} ${compact ? "gear-art-compact" : ""} slot-${item.slot.toLowerCase()}`}>
-    <span className="gear-art-aura"/><svg viewBox="0 0 100 100" role="img" aria-label={item.name}>
+    <span className="gear-art-aura"/><svg viewBox="0 0 120 120" role="img" aria-label={item.name}>
       <defs>
-        <linearGradient id={`metal-${item.id}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff2c5"/><stop offset=".35" stopColor="#b9c9e8"/><stop offset=".7" stopColor="#5b6d9d"/><stop offset="1" stopColor="#171c36"/></linearGradient>
-        <linearGradient id={`glow-${item.id}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff7c8"/><stop offset=".5" stopColor={item.rarity === "Legendary" ? "#ffb52e" : item.rarity === "Epic" ? "#c47aff" : item.rarity === "Rare" ? "#53c9ff" : "#b8c2d5"}/><stop offset="1" stopColor="#24365e"/></linearGradient>
+        <linearGradient id={`steel-${item.id}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff8df"/><stop offset=".18" stopColor="#d8e1ef"/><stop offset=".42" stopColor="#7588a7"/><stop offset=".68" stopColor="#303d5c"/><stop offset="1" stopColor="#101629"/></linearGradient>
+        <linearGradient id={`edge-${item.id}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff6d2"/><stop offset=".45" stopColor={accent}/><stop offset="1" stopColor="#55436f"/></linearGradient>
+        <linearGradient id={`leather-${item.id}`} x1="0" y1="0" x2="0" y2="1"><stop stopColor="#9b704d"/><stop offset=".5" stopColor="#4a2d2c"/><stop offset="1" stopColor="#1c1b2b"/></linearGradient>
+        <radialGradient id={`gem-${item.id}`}><stop stopColor="#fff"/><stop offset=".22" stopColor={accent}/><stop offset="1" stopColor="#382c68"/></radialGradient>
+        <filter id={`shadow-${item.id}`} x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
       </defs>
-      {item.slot === "Weapon" && <g transform={`rotate(${variant * 7 - 7} 50 50)`}><path d="M50 7 59 38 53 69 50 88 47 69 41 38Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="2.5"/><path d="M50 12 50 67" stroke="#fff4d2" strokeWidth="2"/><path d="M31 55 69 55 64 63 36 63Z" fill={`url(#glow-${item.id})`} stroke="#fff0bd" strokeWidth="2"/><path d="M46 64 54 64 55 82 45 82Z" fill="#76513d" stroke="#e9c58d" strokeWidth="2"/><circle cx="50" cy="86" r="5" fill={`url(#glow-${item.id})`}/></g>}
-      {item.slot === "Armor" && <g><path d="M30 19 42 11 50 17 58 11 70 19 83 32 73 47 69 82 50 91 31 82 27 47 17 32Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="3"/><path d="M42 13 50 29 58 13 66 25 61 47 50 56 39 47 34 25Z" fill="#273957" stroke="#f4d99a" strokeWidth="2"/><path d="M50 30 58 43 50 58 42 43Z" fill={`url(#glow-${item.id})`}/><path d="M29 51 42 58 38 80 28 72M71 51 58 58 62 80 72 72" fill="none" stroke="#e7c68c" strokeWidth="4"/></g>}
-      {item.slot === "Boots" && <g><path d="M27 13 53 13 55 49 73 59 83 75 78 87 18 87 15 77 30 65Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="3"/><path d="M29 17 50 17 49 51 31 63Z" fill="#273957" stroke="#e6d4ad" strokeWidth="2"/><path d="M31 63 71 63 80 76 20 76Z" fill={`url(#glow-${item.id})`} stroke="#f3d9a1" strokeWidth="2"/><path d="M31 30 49 30M31 40 49 40" stroke="#fff0c8" strokeWidth="3"/></g>}
-      {item.slot === "Necklace" && <g><path d="M22 18 Q50 75 78 18" fill="none" stroke={`url(#glow-${item.id})`} strokeWidth="5"/><path d="M50 56 66 70 50 92 34 70Z" fill={`url(#metal-${item.id})`} stroke={`url(#glow-${item.id})`} strokeWidth="3"/><path d="M50 61 59 71 50 83 41 71Z" fill={`url(#glow-${item.id})`}/><circle cx="22" cy="18" r="4" fill="#f7e5b3"/><circle cx="78" cy="18" r="4" fill="#f7e5b3"/></g>}
-      <path d={variant === 0 ? "M12 30 16 22 20 30 28 34 20 38 16 46 12 38 4 34Z" : variant === 1 ? "M78 8 81 17 90 20 81 23 78 32 75 23 66 20 75 17Z" : "M10 72 13 78 20 81 13 84 10 90 7 84 0 81 7 78Z"} fill="#fff1bc" opacity=".8"/>
+      <ellipse cx="60" cy="105" rx="33" ry="5" fill="#000" opacity=".55" filter={`url(#shadow-${item.id})`}/>
+      {item.slot === "Weapon" && <g transform={`rotate(${variant * 5 - 5} 60 60)`}>
+        <path d="M60 7 70 35 65 70 60 91 55 70 50 35Z" fill="#050914" opacity=".7" transform="translate(2 3)"/>
+        <path d="M60 7 70 35 65 70 60 91 55 70 50 35Z" fill={`url(#steel-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2"/>
+        <path d="M60 12 61 68 60 84 58 68Z" fill="#fff9e8" opacity=".72"/>
+        <path d="M51 31 60 13 69 31 65 38 60 33 55 38Z" fill={`url(#edge-${item.id})`} opacity=".9"/>
+        <path d="M34 59 86 59 78 68 42 68Z" fill={`url(#steel-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2.5"/>
+        <path d="M39 61 81 61" stroke="#fff4d0" strokeWidth="1.5"/>
+        <path d="M55 68 65 68 67 91 53 91Z" fill={`url(#leather-${item.id})`} stroke="#d6b17b" strokeWidth="2"/>
+        <path d="M55 73 65 73M54 81 66 81" stroke="#e9c78e" strokeWidth="1.8"/>
+        <path d="M49 92 71 92 75 99 45 99Z" fill={`url(#steel-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2"/>
+        <path d="M60 17 60 31" stroke="#fff" strokeWidth="1.4" opacity=".8"/>
+        <path d="M60 43 63 49 60 55 57 49Z" fill={`url(#gem-${item.id})`} stroke="#fff0bd" strokeWidth="1"/>
+      </g>}
+      {item.slot === "Armor" && <g>
+        <path d="M35 18 49 10 60 17 71 10 85 18 105 38 91 58 86 99 60 111 34 99 29 58 15 38Z" fill="#050914" opacity=".55" transform="translate(2 3)"/>
+        <path d="M35 18 49 10 60 17 71 10 85 18 105 38 91 58 86 99 60 111 34 99 29 58 15 38Z" fill={`url(#steel-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2.5"/>
+        <path d="M49 13 60 28 71 13 83 26 78 53 60 68 42 53 37 26Z" fill="#202c47" stroke="#d8c18e" strokeWidth="2"/>
+        <path d="M60 29 72 49 60 70 48 49Z" fill={`url(#edge-${item.id})`} stroke="#fff0c4" strokeWidth="1.5"/>
+        <path d="M17 39 34 47 39 70 27 66 13 52Z M103 39 86 47 81 70 93 66 107 52Z" fill={`url(#steel-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2"/>
+        <path d="M36 72 49 78 46 101 34 96ZM84 72 71 78 74 101 86 96Z" fill="#293653" stroke="#bca77d" strokeWidth="1.5"/>
+        <path d="M60 75 68 87 60 101 52 87Z" fill={`url(#gem-${item.id})`}/>
+        <path d="M43 24 49 31M77 24 71 31M36 84 43 91M84 84 77 91" stroke="#fff4d4" strokeWidth="2" opacity=".7"/>
+      </g>}
+      {item.slot === "Boots" && <g>
+        <path d="M30 14 67 14 70 55 88 66 104 88 98 102 20 102 14 91 31 73Z" fill="#050914" opacity=".6" transform="translate(2 3)"/>
+        <path d="M30 14 67 14 70 55 88 66 104 88 98 102 20 102 14 91 31 73Z" fill={`url(#steel-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2.5"/>
+        <path d="M35 18 62 18 64 58 36 73Z" fill="#26324c" stroke="#d8c18e" strokeWidth="2"/>
+        <path d="M34 30 63 30M35 42 64 42M36 54 65 54" stroke="#f4e3bc" strokeWidth="2.2"/>
+        <path d="M36 67 81 65 99 88 20 91Z" fill={`url(#leather-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2"/>
+        <path d="M18 91 100 88 98 101 21 104Z" fill="#171c2d" stroke="#d8c18e" strokeWidth="2"/>
+        <path d="M47 22 55 33 47 44 39 33Z" fill={`url(#gem-${item.id})`}/>
+        <path d="M30 77 45 83M54 74 69 81M76 72 88 82" stroke="#e8c68c" strokeWidth="2"/>
+      </g>}
+      {item.slot === "Necklace" && <g>
+        <path d="M24 17 Q60 105 96 17" fill="none" stroke="#090d18" strokeWidth="11" transform="translate(1 3)"/>
+        <path d="M24 17 Q60 105 96 17" fill="none" stroke={`url(#edge-${item.id})`} strokeWidth="7"/>
+        <path d="M24 17 Q60 105 96 17" fill="none" stroke="#fff2c8" strokeWidth="1.5" opacity=".8"/>
+        <path d="M60 63 78 82 60 109 42 82Z" fill={`url(#steel-${item.id})`} stroke={`url(#edge-${item.id})`} strokeWidth="2.5"/>
+        <path d="M60 69 71 82 60 99 49 82Z" fill={`url(#gem-${item.id})`} stroke="#fff1c7" strokeWidth="1.4"/>
+        <path d="M60 62 67 70 60 78 53 70Z" fill="#f7dfaa" stroke={`url(#edge-${item.id})`} strokeWidth="1.5"/>
+        <circle cx="24" cy="17" r="5" fill={`url(#gem-${item.id})`} stroke="#fff1c7" strokeWidth="1.5"/><circle cx="96" cy="17" r="5" fill={`url(#gem-${item.id})`} stroke="#fff1c7" strokeWidth="1.5"/>
+      </g>}
+      <path d={variant === 0 ? "M13 25 16 17 19 25 27 28 19 31 16 39 13 31 5 28Z" : variant === 1 ? "M94 9 97 17 105 20 97 23 94 31 91 23 83 20 91 17Z" : "M10 77 13 83 20 86 13 89 10 96 7 89 0 86 7 83Z"} fill="#fff5d5" opacity=".85"/>
     </svg>
     <span className="gear-art-rarity">{item.rarity === "Common" ? "N" : item.rarity === "Rare" ? "R" : item.rarity === "Epic" ? "E" : "L"}</span>
   </div>;
@@ -239,7 +282,7 @@ export default function MythraethGame() {
   return <main className="game-shell">
     <div className="ambient ambient-one"/><div className="ambient ambient-two"/>
     <header className="topbar">
-      <button className="brand" onClick={() => setActiveTab("Home")} aria-label="MYTHRAETH home"><span className="brand-mark"><Crown size={22}/></span><span><b>MYTHRAETH</b><small>RISE OF THE RUNEBORN</small></span></button>
+      <button className="brand" onClick={() => setActiveTab("Home")} aria-label="MYTHRAETH home"><span className="brand-mark"><Crown size={24}/><i/></span><span><b>MYTHRAETH</b><small>RISE OF THE RUNEBORN</small></span></button>
       <div className="player-chip"><div className="player-avatar"><img src={activeHero.image} alt="Active hero"/></div><span><b>Lv. {activeHero.level} · Runebound</b><small>{activeHero.name}</small></span></div>
       <div className="resources"><span><Coins size={16}/> {fmt(gold)}</span><span><Gem size={16}/> {fmt(gems)}</span></div>
       <button className="menu-toggle" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle navigation"><Menu/></button>
@@ -301,7 +344,7 @@ export default function MythraethGame() {
       </section>
     </div>
 
-    <nav className="mobile-nav">{nav.slice(0,6).map(item=><button key={item.tab} onClick={()=>setActiveTab(item.tab)} className={activeTab===item.tab?"active":""}>{item.icon}<small>{item.label}</small></button>)}</nav>
+    <nav className="mobile-nav">{[nav[0],nav[1],nav[2],nav[4],nav[5],nav[6]].map(item=><button key={item.tab} onClick={()=>setActiveTab(item.tab)} className={activeTab===item.tab?"active":""}>{item.icon}<small>{item.label}</small></button>)}</nav>
 
     {battleOpen && <div className="modal-backdrop"><section className="battle-modal"><button className="modal-close" onClick={()=>setBattleOpen(false)}><X/></button><div className="battle-title"><span className="eyebrow">RUNE ARENA · DUEL {turn}</span><h2>{battleHp>0&&enemyHp>0?"The Clash of Champions":enemyHp<=0?"VICTORY":"DEFEAT"}</h2></div><div className="battle-duel"><div className="duelist"><HeroArt hero={activeHero}/><b>{activeHero.name}</b><small>YOUR CHAMPION</small><div className="hp-track"><i style={{width:`${Math.max(0,battleHp/activeHero.hp*100)}%`}}/></div><small>{battleHp} / {activeHero.hp} HP</small></div><div className="versus">VS</div><div className="duelist enemy-duelist"><div className="enemy-battle-art"><img src={selectedEnemy.image} alt={selectedEnemy.name}/></div><b>{selectedEnemy.name}</b><small>ARENA OPPONENT</small><div className="hp-track enemy-hp"><i style={{width:`${Math.max(0,enemyHp/selectedEnemy.hp*100)}%`}}/></div><small>{enemyHp} / {selectedEnemy.hp} HP</small></div></div><div className="battle-log">{battleLog.map((line,i)=><p key={i}>{line}</p>)}</div>{battleHp>0&&enemyHp>0?<div className="battle-actions"><button disabled={busy} onClick={()=>takeTurn("strike")}><Swords/> STRIKE</button><button disabled={busy} onClick={()=>takeTurn("rune")}><Sparkles/> RUNE BURST</button><button disabled={busy} onClick={()=>takeTurn("guard")}><Shield/> GUARD</button></div>:<button className="button button-gold battle-end" onClick={()=>setBattleOpen(false)}>RETURN TO ARENA</button>}</section></div>}
     {toast && <div className="toast"><Sparkles size={16}/>{toast}</div>}
