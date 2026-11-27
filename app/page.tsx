@@ -61,6 +61,8 @@ export default function MythraethGame() {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState("");
   const [summonCount, setSummonCount] = useState(0);
+  const [attempts, setAttempts] = useState(3);
+  const [claimedQuests, setClaimedQuests] = useState<string[]>([]);
   const [filter, setFilter] = useState("All");
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -78,6 +80,8 @@ export default function MythraethGame() {
         if (typeof save.gold === "number") setGold(save.gold);
         if (typeof save.gems === "number") setGems(save.gems);
         if (typeof save.summonCount === "number") setSummonCount(save.summonCount);
+        if (typeof save.attempts === "number") setAttempts(save.attempts);
+        if (Array.isArray(save.claimedQuests)) setClaimedQuests(save.claimedQuests);
       }
     } catch { /* start with a clean save if local data is invalid */ }
     setLoaded(true);
@@ -85,9 +89,9 @@ export default function MythraethGame() {
 
   useEffect(() => {
     if (!loaded) return;
-    try { localStorage.setItem("mythraeth-save-v1", JSON.stringify({ heroes, activeHeroId, gold, gems, summonCount })); }
+    try { localStorage.setItem("mythraeth-save-v1", JSON.stringify({ heroes, activeHeroId, gold, gems, summonCount, attempts, claimedQuests })); }
     catch { /* local save is optional */ }
-  }, [loaded, heroes, activeHeroId, gold, gems, summonCount]);
+  }, [loaded, heroes, activeHeroId, gold, gems, summonCount, attempts, claimedQuests]);
 
   const nav = [
     { label: "Home", icon: <Home size={18}/>, tab: "Home" },
@@ -101,6 +105,8 @@ export default function MythraethGame() {
   ];
 
   const startBattle = (enemy: Enemy) => {
+    if (attempts <= 0) { showToast("No Arena attempts left today."); return; }
+    setAttempts(v => v - 1);
     setSelectedEnemy(enemy); setBattleHp(activeHero.hp); setEnemyHp(enemy.hp);
     setTurn(1); setBattleLog([`The battle begins. ${enemy.name} enters the arena.`]); setBattleOpen(true);
   };
@@ -144,7 +150,10 @@ export default function MythraethGame() {
     showToast(`${rarity} hero summoned: ${hero.name}!`);
   };
 
-  const claimQuest = (reward: number, label: string) => { setGold(v => v + reward); showToast(`${label} claimed · +${reward} gold`); };
+  const claimQuest = (reward: number, label: string) => {
+    if (claimedQuests.includes(label)) { showToast("This quest has already been claimed."); return; }
+    setClaimedQuests(list => [...list, label]); setGold(v => v + reward); showToast(`${label} claimed · +${reward} gold`);
+  };
   const filteredHeroes = filter === "All" ? heroes : heroes.filter(h => h.rarity === filter);
 
   return <main className="game-shell">
@@ -172,7 +181,7 @@ export default function MythraethGame() {
             <div className="champion-visual"><img src={activeHero.image} alt={activeHero.name}/><div className="champion-vignette"/><div className="champion-caption"><span>YOUR CHAMPION</span><h2>{activeHero.name}</h2><small>{activeHero.rarity} · {activeHero.className}</small></div></div>
             <div className="champion-stats"><div className="stat-label">SQUAD POWER <b>{fmt(totalPower)}</b></div><div className="power-meter"><span style={{width: `${Math.min(100,totalPower/7)}%`}}/></div><div className="stat-grid"><span><Heart/> HP <b>{activeHero.hp}</b></span><span><Zap/> PWR <b>{activeHero.power}</b></span><span><Shield/> DEF <b>{activeHero.defense}</b></span><span><Sparkles/> LCK <b>{activeHero.luck}</b></span></div><button className="button button-blue" onClick={() => setActiveTab("Heroes")}><Users size={17}/> EDIT YOUR SQUAD</button></div>
           </div>
-          <div className="section-title"><div><span className="eyebrow">CHOOSE YOUR OPPONENT</span><h2>Champions of the Arena</h2></div><span className="attempts">DAILY ATTEMPTS <b>3 / 5</b></span></div>
+          <div className="section-title"><div><span className="eyebrow">CHOOSE YOUR OPPONENT</span><h2>Champions of the Arena</h2></div><span className="attempts">DAILY ATTEMPTS <b>{attempts} / 5</b></span></div>
           <div className="enemy-list">{enemies.map((enemy, i) => <article className="enemy-card" key={enemy.id}><div className="enemy-art"><img src={enemy.image} alt={enemy.name}/><span>0{i+1}</span></div><div className="enemy-info"><span className="eyebrow">ARENA CHALLENGER · LV. {enemy.level}</span><h3>{enemy.name}</h3><p>{enemy.epithet}</p><div className="enemy-power"><Swords size={14}/> POWER {enemy.power}</div></div><div className="enemy-rewards"><small>VICTORY REWARDS</small><b><Coins size={15}/> {fmt(enemy.gold)}</b><b><Gem size={15}/> {enemy.gems}</b></div><button className="button button-gold" onClick={() => startBattle(enemy)}>FIGHT <Swords size={16}/></button></article>)}</div>
           <div className="arena-footer"><span><Shield size={15}/> Your active champion enters the Rune Arena.</span><span>SEASON 04 · THE VEILFALL</span></div>
         </div>}
@@ -191,13 +200,13 @@ export default function MythraethGame() {
 
         {activeTab === "Dungeon" && <div className="simple-view"><div className="page-heading"><div className="eyebrow">DESCEND INTO DARKNESS</div><h1>Ancient <em>Dungeons</em></h1><p>Three forgotten gates stand before you. Their secrets are not freely given.</p></div><div className="dungeon-grid">{["The Hollow Keep","Frostgrave Depths","Ashen Cathedral"].map((name,i)=><article key={name}><div className="dungeon-symbol">{i===0?<Castle/>:i===1?<Sparkles/>:<Flame/>}</div><span className="eyebrow">DUNGEON 0{i+1}</span><h3>{name}</h3><p>{["A fortress swallowed by the Veil.","A frozen labyrinth beneath the mountains.","A sanctuary consumed by old fire."][i]}</p><b>RECOMMENDED POWER · {120+i*55}</b><button className="button button-blue" onClick={()=>showToast("Dungeon expedition is coming in the next chapter.")}>PREPARE EXPEDITION</button></article>)}</div></div>}
 
-        {activeTab === "Quests" && <div className="simple-view"><div className="page-heading"><div className="eyebrow">THE CHRONICLE</div><h1>Daily <em>Quests</em></h1><p>Every legend is built one deed at a time.</p></div><div className="quest-list">{[{name:"Arena Challenger",desc:"Enter the Rune Arena and face a champion.",reward:500},{name:"Gather the Runeborn",desc:"Summon a new hero at the Astral Altar.",reward:350},{name:"A Growing Legend",desc:"Own five heroes in your collection.",reward:800}].map((q,i)=><article key={q.name}><div className="quest-icon"><ScrollText/></div><div><b>{q.name}</b><p>{q.desc}</p><small>REWARD · {q.reward} GOLD</small></div><button className="button button-gold" onClick={()=>claimQuest(q.reward,q.name)}>CLAIM</button></article>)}</div></div>}
+        {activeTab === "Quests" && <div className="simple-view"><div className="page-heading"><div className="eyebrow">THE CHRONICLE</div><h1>Daily <em>Quests</em></h1><p>Every legend is built one deed at a time.</p></div><div className="quest-list">{[{name:"Arena Challenger",desc:"Enter the Rune Arena and face a champion.",reward:500},{name:"Gather the Runeborn",desc:"Summon a new hero at the Astral Altar.",reward:350},{name:"A Growing Legend",desc:"Own five heroes in your collection.",reward:800}].map((q,i)=><article key={q.name}><div className="quest-icon"><ScrollText/></div><div><b>{q.name}</b><p>{q.desc}</p><small>REWARD · {q.reward} GOLD</small></div><button className="button button-gold" disabled={claimedQuests.includes(q.name)} onClick={()=>claimQuest(q.reward,q.name)}>{claimedQuests.includes(q.name)?"CLAIMED":"CLAIM"}</button></article>)}</div></div>}
 
         {activeTab === "Guild" && <div className="simple-view"><div className="page-heading"><div className="eyebrow">STAND TOGETHER</div><h1>Runeborn <em>Guilds</em></h1><p>Even the strongest champion needs allies.</p></div><div className="coming-panel"><Users size={48}/><h2>The Guild Hall is awakening.</h2><p>Guild creation, member ranks, shared quests and seasonal wars are planned for a future chapter.</p></div></div>}
 
         {activeTab === "Rankings" && <div className="simple-view"><div className="page-heading"><div className="eyebrow">THE ETERNAL LADDER</div><h1>Realm <em>Rankings</em></h1><p>Only the strongest names survive the chronicles.</p></div><div className="ranking-list">{["Aetherion","Valkyra","DreadSaint","Mukedlii","Nyx"].map((n,i)=><div key={n}><b className="rank-number">0{i+1}</b><span className="rank-avatar">{n[0]}</span><strong>{n}</strong><span>{fmt(248000-i*18400)} PWR</span><Trophy size={17}/></div>)}</div></div>}
 
-        <footer className="content-footer"><span>MYTHRAETH © 2026</span><span>BUILT FOR THE RUNEBORN</span><button onClick={()=>{localStorage.removeItem("mythraeth-save-v1");setHeroes(initialHeroes);setActiveHeroId("warden");setGold(245670);setGems(12450);setSummonCount(0);showToast("Local save reset.");}}><RotateCcw size={12}/> RESET LOCAL SAVE</button></footer>
+        <footer className="content-footer"><span>MYTHRAETH © 2026</span><span>BUILT FOR THE RUNEBORN</span><button onClick={()=>{localStorage.removeItem("mythraeth-save-v1");setHeroes(initialHeroes);setActiveHeroId("warden");setGold(245670);setGems(12450);setSummonCount(0);setAttempts(3);setClaimedQuests([]);showToast("Local save reset.");}}><RotateCcw size={12}/> RESET LOCAL SAVE</button></footer>
       </section>
     </div>
 
