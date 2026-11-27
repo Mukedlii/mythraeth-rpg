@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { Coins, Gem, Plus } from "lucide-react";
 
 export type GearRarity = "Common" | "Rare" | "Epic" | "Legendary" | "Mythic";
@@ -7,8 +7,8 @@ export function Panel({ children, className = "", ...props }: HTMLAttributes<HTM
   return <div className={`game-panel ${className}`} {...props}>{children}</div>;
 }
 
-export function RarityFrame({ rarity, children, className = "", ariaLabel }: { rarity: GearRarity; children: ReactNode; className?: string; ariaLabel?: string }) {
-  return <div role="img" aria-label={ariaLabel} className={`rarity-frame ${rarity.toLowerCase()} ${className}`}>{children}</div>;
+export function RarityFrame({ rarity, children, className = "", ariaLabel, style }: { rarity: GearRarity; children: ReactNode; className?: string; ariaLabel?: string; style?: CSSProperties }) {
+  return <div role="img" aria-label={ariaLabel} style={style} className={`rarity-frame ${rarity.toLowerCase()} ${className}`}>{children}</div>;
 }
 
 export function StarRating({ value, max = 5 }: { value: number; max?: number }) {
