@@ -48,7 +48,9 @@ const rarityRank: Record<Rarity, number> = { Common: 1, Rare: 2, Epic: 3, Legend
 const rarityClass: Record<Rarity, string> = { Common: "common", Rare: "rare", Epic: "epic", Legendary: "legendary", Mythic: "mythic" };
 const fmt = (n: number) => new Intl.NumberFormat("en-US").format(n);
 
-const gearBonusText = (item: Gear) => [item.hp && `+${item.hp} HP`, item.power && `+${item.power} PWR`, item.defense && `+${item.defense} DEF`, item.luck && `+${item.luck} LCK`].filter(Boolean).join(" · ");\n\nfunction IconLabel({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+const gearBonusText = (item: Gear) => [item.hp && `+${item.hp} HP`, item.power && `+${item.power} PWR`, item.defense && `+${item.defense} DEF`, item.luck && `+${item.luck} LCK`].filter(Boolean).join(" · ");
+
+function IconLabel({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return <span className="icon-label">{icon}{children}</span>;
 }
 
@@ -77,12 +79,22 @@ export default function MythraethGame() {
   const [toast, setToast] = useState("");
   const [summonCount, setSummonCount] = useState(0);
   const [attempts, setAttempts] = useState(3);
-  const [claimedQuests, setClaimedQuests] = useState<string[]>([]);\n  const [inventory, setInventory] = useState<Gear[]>(starterGear);\n  const [equipped, setEquipped] = useState<Record<string, Partial<Record<GearSlot, string>>>>({ warden: { Weapon: "starter-sword", Armor: "starter-armor", Boots: "starter-boots", Necklace: "starter-necklace" } });\n  const [gearFilter, setGearFilter] = useState<"All" | GearSlot>("All");
+  const [claimedQuests, setClaimedQuests] = useState<string[]>([]);
+  const [inventory, setInventory] = useState<Gear[]>(starterGear);
+  const [equipped, setEquipped] = useState<Record<string, Partial<Record<GearSlot, string>>>>({ warden: { Weapon: "starter-sword", Armor: "starter-armor", Boots: "starter-boots", Necklace: "starter-necklace" } });
+  const [gearFilter, setGearFilter] = useState<"All" | GearSlot>("All");
   const [filter, setFilter] = useState("All");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const activeHero = heroes.find(h => h.id === activeHeroId) || heroes[0];
-  const totalPower = useMemo(() => heroes.slice(0, 3).reduce((sum, h) => sum + h.power + h.defense, 0), [heroes]);
+  const baseHero = heroes.find(h => h.id === activeHeroId) || heroes[0];
+  const activeGear = gearSlots.map(slot => inventory.find(item => item.id === equipped[activeHeroId]?.[slot])).filter((item): item is Gear => Boolean(item));
+  const activeBonus = activeGear.reduce((sum, item) => ({ hp: sum.hp + item.hp, power: sum.power + item.power, defense: sum.defense + item.defense, luck: sum.luck + item.luck }), { hp: 0, power: 0, defense: 0, luck: 0 });
+  const activeHero: Hero = { ...baseHero, hp: baseHero.hp + activeBonus.hp, power: baseHero.power + activeBonus.power, defense: baseHero.defense + activeBonus.defense, luck: baseHero.luck + activeBonus.luck };
+  const totalPower = useMemo(() => heroes.slice(0, 3).reduce((sum, h) => {
+    const worn = equipped[h.id] || {};
+    const bonus = Object.values(worn).reduce((b, id) => { const item = inventory.find(g => g.id === id); return item ? b + item.power + item.defense : b; }, 0);
+    return sum + h.power + h.defense + bonus;
+  }, 0), [heroes, equipped, inventory]);
   const showToast = (message: string) => { setToast(message); window.setTimeout(() => setToast(""), 2400); };
 
   useEffect(() => {
@@ -96,7 +108,9 @@ export default function MythraethGame() {
         if (typeof save.gems === "number") setGems(save.gems);
         if (typeof save.summonCount === "number") setSummonCount(save.summonCount);
         if (typeof save.attempts === "number") setAttempts(save.attempts);
-        if (Array.isArray(save.claimedQuests)) setClaimedQuests(save.claimedQuests);\n        if (Array.isArray(save.inventory)) setInventory(save.inventory);\n        if (save.equipped && typeof save.equipped === "object") setEquipped(save.equipped);
+        if (Array.isArray(save.claimedQuests)) setClaimedQuests(save.claimedQuests);
+        if (Array.isArray(save.inventory)) setInventory(save.inventory);
+        if (save.equipped && typeof save.equipped === "object") setEquipped(save.equipped);
       }
     } catch { /* start with a clean save if local data is invalid */ }
     setLoaded(true);
@@ -111,7 +125,8 @@ export default function MythraethGame() {
   const nav = [
     { label: "Home", icon: <Home size={18}/>, tab: "Home" },
     { label: "Arena", icon: <Swords size={19}/>, tab: "Arena" },
-    { label: "Heroes", icon: <Shield size={18}/>, tab: "Heroes" },\n    { label: "Equipment", icon: <Swords size={18}/>, tab: "Equipment" },
+    { label: "Heroes", icon: <Shield size={18}/>, tab: "Heroes" },
+    { label: "Equipment", icon: <Swords size={18}/>, tab: "Equipment" },
     { label: "Dungeon", icon: <Castle size={18}/>, tab: "Dungeon" },
     { label: "Quests", icon: <ScrollText size={18}/>, tab: "Quests" },
     { label: "Summon", icon: <Sparkles size={18}/>, tab: "Summon" },
@@ -119,7 +134,22 @@ export default function MythraethGame() {
     { label: "Rankings", icon: <Trophy size={18}/>, tab: "Rankings" }
   ];
 
-  const createLoot = (): Gear => {\n    const roll = Math.random();\n    const rarity: Rarity = roll > .985 ? "Legendary" : roll > .86 ? "Epic" : roll > .52 ? "Rare" : "Common";\n    const slot = gearSlots[Math.floor(Math.random() * gearSlots.length)];\n    const tier = rarity === "Legendary" ? 4 : rarity === "Epic" ? 3 : rarity === "Rare" ? 2 : 1;\n    const names = gearNames[slot];\n    const name = names[Math.floor(Math.random() * names.length)];\n    const main = 2 + tier * 4 + Math.floor(Math.random() * (tier * 3));\n    const bonus = Math.floor(Math.random() * (tier * 2 + 1));\n    const stats = slot === "Weapon" ? { hp: 0, power: main, defense: 0, luck: bonus } : slot === "Armor" ? { hp: main * 2, power: 0, defense: main, luck: 0 } : slot === "Boots" ? { hp: bonus, power: 0, defense: main, luck: bonus + 1 } : { hp: bonus, power: bonus, defense: 0, luck: main };\n    return { id: `gear-${Date.now()}-${Math.random().toString(36).slice(2,7)}`, name, slot, rarity, ...stats, description: `${rarity} ${slot.toLowerCase()} recovered from the Rune Arena.` };\n  };\n  const equipGear = (item: Gear) => { setEquipped(prev => ({ ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}), [item.slot]: item.id } })); showToast(`${item.name} equipped on ${activeHero.name}.`); };\n  const unequipGear = (slot: GearSlot) => { setEquipped(prev => { const next = { ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}) } }; delete next[activeHeroId][slot]; return next; }); showToast(`${slot} unequipped.`); };\n\n  const startBattle = (enemy: Enemy) => {
+  const createLoot = (): Gear => {
+    const roll = Math.random();
+    const rarity: Rarity = roll > .985 ? "Legendary" : roll > .86 ? "Epic" : roll > .52 ? "Rare" : "Common";
+    const slot = gearSlots[Math.floor(Math.random() * gearSlots.length)];
+    const tier = rarity === "Legendary" ? 4 : rarity === "Epic" ? 3 : rarity === "Rare" ? 2 : 1;
+    const names = gearNames[slot];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const main = 2 + tier * 4 + Math.floor(Math.random() * (tier * 3));
+    const bonus = Math.floor(Math.random() * (tier * 2 + 1));
+    const stats = slot === "Weapon" ? { hp: 0, power: main, defense: 0, luck: bonus } : slot === "Armor" ? { hp: main * 2, power: 0, defense: main, luck: 0 } : slot === "Boots" ? { hp: bonus, power: 0, defense: main, luck: bonus + 1 } : { hp: bonus, power: bonus, defense: 0, luck: main };
+    return { id: `gear-${Date.now()}-${Math.random().toString(36).slice(2,7)}`, name, slot, rarity, ...stats, description: `${rarity} ${slot.toLowerCase()} recovered from the Rune Arena.` };
+  };
+  const equipGear = (item: Gear) => { setEquipped(prev => ({ ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}), [item.slot]: item.id } })); showToast(`${item.name} equipped on ${activeHero.name}.`); };
+  const unequipGear = (slot: GearSlot) => { setEquipped(prev => { const next = { ...prev, [activeHeroId]: { ...(prev[activeHeroId] || {}) } }; delete next[activeHeroId][slot]; return next; }); showToast(`${slot} unequipped.`); };
+
+  const startBattle = (enemy: Enemy) => {
     if (attempts <= 0) { showToast("No Arena attempts left today."); return; }
     setAttempts(v => v - 1);
     setSelectedEnemy(enemy); setBattleHp(activeHero.hp); setEnemyHp(enemy.hp);
@@ -201,7 +231,18 @@ export default function MythraethGame() {
           <div className="arena-footer"><span><Shield size={15}/> Your active champion enters the Rune Arena.</span><span>SEASON 04 · THE VEILFALL</span></div>
         </div>}
 
-        {activeTab === "Equipment" && <div className="equipment-view">\n      <div className="page-heading"><div className="eyebrow"><Swords size={14}/> THE ARMOURY</div><h1>Hero <em>Equipment</em></h1><p>Equip relics, strengthen your champion and prepare for battle.</p></div>\n      <div className="equipment-hero"><HeroArt hero={activeHero}/><div><span className={`rarity-text ${rarityClass[activeHero.rarity]}`}>{activeHero.rarity.toUpperCase()} CHAMPION</span><h2>{activeHero.name}</h2><p>{activeHero.className} · Level {activeHero.level}</p><div className="gear-statline"><span>HP <b>{activeHero.hp}</b></span><span>PWR <b>{activeHero.power}</b></span><span>DEF <b>{activeHero.defense}</b></span><span>LCK <b>{activeHero.luck}</b></span></div></div></div>\n      <div className="section-title"><div><span className="eyebrow">ACTIVE LOADOUT</span><h2>Equipped items</h2></div><span className="attempts">{activeGear.length} / 4 SLOTS FILLED</span></div>\n      <div className="equipped-grid">{gearSlots.map(slot => { const item = inventory.find(g => g.id === equipped[activeHeroId]?.[slot]); return <article className={`gear-card ${item ? rarityClass[item.rarity] : "empty"}`} key={slot}><div className="gear-slot-icon">{slot === "Weapon" ? <Swords/> : slot === "Armor" ? <Shield/> : slot === "Boots" ? <Zap/> : <Gem/>}</div><div><small>{slot.toUpperCase()}</small><b>{item ? item.name : "Empty slot"}</b><span>{item ? `${item.rarity.toUpperCase()} · ${gearBonusText(item)}` : "Choose an item below"}</span></div>{item && <button className="gear-action" onClick={() => unequipGear(slot)}>UNEQUIP</button>}</article>; })}</div>\n      <div className="section-title"><div><span className="eyebrow">YOUR TREASURE</span><h2>Equipment inventory</h2></div><span className="attempts">{inventory.length} ITEMS</span></div>\n      <div className="filter-tabs gear-filters">{(["All", ...gearSlots] as const).map(slot => <button key={slot} className={gearFilter===slot?"selected":""} onClick={() => setGearFilter(slot)}>{slot}</button>)}</div>\n      <div className="gear-inventory">{inventory.filter(item => gearFilter === "All" || item.slot === gearFilter).map(item => { const isEquipped = equipped[activeHeroId]?.[item.slot] === item.id; return <article className={`gear-item ${rarityClass[item.rarity]}`} key={item.id}><div className="gear-item-top"><span className="gear-slot-label">{item.slot}</span><b className="rarity-text">{item.rarity === "Common" ? "NORMAL" : item.rarity.toUpperCase()}</b></div><h3>{item.name}</h3><p>{item.description}</p><div className="gear-bonuses">{item.hp>0&&<span>+{item.hp} HP</span>}{item.power>0&&<span>+{item.power} PWR</span>}{item.defense>0&&<span>+{item.defense} DEF</span>}{item.luck>0&&<span>+{item.luck} LCK</span>}</div><button className={`button ${isEquipped?"button-blue":"button-gold"}`} disabled={isEquipped} onClick={() => equipGear(item)}>{isEquipped?"EQUIPPED":`EQUIP ${item.slot.toUpperCase()}`}</button></article>; })}</div>\n      <p className="gear-note">Victory in the Rune Arena grants a random equipment drop. Higher rarity items have stronger bonuses.</p>\n    </div>}\n\n    {activeTab === "Heroes" && <div className="heroes-view">
+        {activeTab === "Equipment" && <div className="equipment-view">
+      <div className="page-heading"><div className="eyebrow"><Swords size={14}/> THE ARMOURY</div><h1>Hero <em>Equipment</em></h1><p>Equip relics, strengthen your champion and prepare for battle.</p></div>
+      <div className="equipment-hero"><HeroArt hero={activeHero}/><div><span className={`rarity-text ${rarityClass[activeHero.rarity]}`}>{activeHero.rarity.toUpperCase()} CHAMPION</span><h2>{activeHero.name}</h2><p>{activeHero.className} · Level {activeHero.level}</p><div className="gear-statline"><span>HP <b>{activeHero.hp}</b></span><span>PWR <b>{activeHero.power}</b></span><span>DEF <b>{activeHero.defense}</b></span><span>LCK <b>{activeHero.luck}</b></span></div></div></div>
+      <div className="section-title"><div><span className="eyebrow">ACTIVE LOADOUT</span><h2>Equipped items</h2></div><span className="attempts">{activeGear.length} / 4 SLOTS FILLED</span></div>
+      <div className="equipped-grid">{gearSlots.map(slot => { const item = inventory.find(g => g.id === equipped[activeHeroId]?.[slot]); return <article className={`gear-card ${item ? rarityClass[item.rarity] : "empty"}`} key={slot}><div className="gear-slot-icon">{slot === "Weapon" ? <Swords/> : slot === "Armor" ? <Shield/> : slot === "Boots" ? <Zap/> : <Gem/>}</div><div><small>{slot.toUpperCase()}</small><b>{item ? item.name : "Empty slot"}</b><span>{item ? `${item.rarity.toUpperCase()} · ${gearBonusText(item)}` : "Choose an item below"}</span></div>{item && <button className="gear-action" onClick={() => unequipGear(slot)}>UNEQUIP</button>}</article>; })}</div>
+      <div className="section-title"><div><span className="eyebrow">YOUR TREASURE</span><h2>Equipment inventory</h2></div><span className="attempts">{inventory.length} ITEMS</span></div>
+      <div className="filter-tabs gear-filters">{(["All", ...gearSlots] as const).map(slot => <button key={slot} className={gearFilter===slot?"selected":""} onClick={() => setGearFilter(slot)}>{slot}</button>)}</div>
+      <div className="gear-inventory">{inventory.filter(item => gearFilter === "All" || item.slot === gearFilter).map(item => { const isEquipped = equipped[activeHeroId]?.[item.slot] === item.id; return <article className={`gear-item ${rarityClass[item.rarity]}`} key={item.id}><div className="gear-item-top"><span className="gear-slot-label">{item.slot}</span><b className="rarity-text">{item.rarity === "Common" ? "NORMAL" : item.rarity.toUpperCase()}</b></div><h3>{item.name}</h3><p>{item.description}</p><div className="gear-bonuses">{item.hp>0&&<span>+{item.hp} HP</span>}{item.power>0&&<span>+{item.power} PWR</span>}{item.defense>0&&<span>+{item.defense} DEF</span>}{item.luck>0&&<span>+{item.luck} LCK</span>}</div><button className={`button ${isEquipped?"button-blue":"button-gold"}`} disabled={isEquipped} onClick={() => equipGear(item)}>{isEquipped?"EQUIPPED":`EQUIP ${item.slot.toUpperCase()}`}</button></article>; })}</div>
+      <p className="gear-note">Victory in the Rune Arena grants a random equipment drop. Higher rarity items have stronger bonuses.</p>
+    </div>}
+
+    {activeTab === "Heroes" && <div className="heroes-view">
           <div className="page-heading"><div className="eyebrow"><Shield size={14}/> YOUR LEGACY</div><h1>Hero <em>Collection</em></h1><p>Gather the Runeborn. Shape your destiny.</p></div>
           <div className="collection-summary"><div><b>{heroes.length}</b><span>HEROES OWNED</span></div><div><b>{new Set(heroes.map(h=>h.className)).size}</b><span>CLASSES</span></div><div><b>{summonCount}</b><span>SUMMONS</span></div><div><b>{fmt(totalPower)}</b><span>SQUAD POWER</span></div></div>
           <div className="collection-tools"><div className="filter-tabs">{["All","Common","Rare","Epic","Legendary","Mythic"].map(f=><button key={f} onClick={()=>setFilter(f)} className={filter===f?"selected":""}>{f}</button>)}</div><span>{filteredHeroes.length} DISCOVERED</span></div>
