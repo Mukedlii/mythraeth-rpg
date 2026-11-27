@@ -268,7 +268,7 @@ export default function MythraethGame() {
     <header className="topbar">
       <div className="player-chip"><div className="player-avatar"><img src={activeHero.image} alt="Active hero"/></div><span><b>Lv. {activeHero.level}</b><small>Player123 · VIP 1</small></span></div>
       <button className="brand" onClick={() => setActiveTab("Home")} aria-label="MYTHRAETH home"><span><b>MYTHRAETH</b><small>RISE OF THE RUNEBORN</small></span></button>
-      <div className="resources"><span><Coins size={16}/> {fmt(gold)} <Plus size={12}/></span><span><Gem size={16}/> {fmt(gems)} <Plus size={12}/></span><button className="hud-icon" onClick={()=>showToast("Settings are coming soon.")}>⚙</button><button className="hud-icon" onClick={()=>setActiveTab("Rankings")}>⚙</button></div>
+      <div className="resources"><span><Coins size={16}/> {fmt(gold)} <Plus size={12}/></span><span><Gem size={16}/> {fmt(gems)} <Plus size={12}/></span><button className="hud-icon" onClick={()=>showToast("Settings are coming soon.")}>⚙</button><button className="hud-icon" onClick={()=>showToast("Settings are coming soon.")}>⚙</button></div><button className="hud-rank" onClick={()=>setActiveTab("Rankings")}><Trophy size={13}/> RANKINGS</button>
     </header>
 
     <div className="game-layout">
