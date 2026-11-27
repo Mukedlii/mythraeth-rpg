@@ -187,8 +187,8 @@ export default function MythraethGame() {
     { label: "Home", icon: <Home size={18}/>, tab: "Home" },
     { label: "Arena", icon: <Swords size={19}/>, tab: "Arena" },
     { label: "Heroes", icon: <Shield size={18}/>, tab: "Heroes" },
-    { label: "Equipment", icon: <Swords size={18}/>, tab: "Equipment" },
     { label: "Dungeon", icon: <Castle size={18}/>, tab: "Dungeon" },
+    { label: "Armoury", icon: <Swords size={18}/>, tab: "Equipment" },
     { label: "Quests", icon: <ScrollText size={18}/>, tab: "Quests" },
     { label: "Summon", icon: <Sparkles size={18}/>, tab: "Summon" },
     { label: "Guild", icon: <Users size={18}/>, tab: "Guild" },
@@ -290,8 +290,11 @@ export default function MythraethGame() {
 
     <div className="game-layout">
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
-        <div className="realm-label">THE SHATTERED REALMS</div>
-        {nav.map(item => <button key={item.tab} onClick={() => {setActiveTab(item.tab);setMenuOpen(false);}} className={`nav-item ${activeTab === item.tab ? "active" : ""}`}>{item.icon}<span>{item.label}</span>{activeTab === item.tab && <ChevronRight size={15}/>}</button>)}
+        <div className="realm-label"><span>✦</span> THE SHATTERED REALMS <span>✦</span></div>
+        <div className="nav-section-label">ADVENTURE</div>
+        {nav.slice(0,5).map(item => <button key={item.tab} onClick={() => {setActiveTab(item.tab);setMenuOpen(false);}} className={`nav-item ${activeTab === item.tab ? "active" : ""}`}>{item.icon}<span>{item.label}</span>{activeTab === item.tab && <ChevronRight size={15}/>}</button>)}
+        <div className="nav-section-label nav-section-secondary">KINGDOM</div>
+        {nav.slice(5).map(item => <button key={item.tab} onClick={() => {setActiveTab(item.tab);setMenuOpen(false);}} className={`nav-item ${activeTab === item.tab ? "active" : ""}`}>{item.icon}<span>{item.label}</span>{activeTab === item.tab && <ChevronRight size={15}/>}</button>)}
         <div className="sidebar-bottom"><div className="season-icon"><Flame size={18}/></div><div><b>Season of Embers</b><small>12 days remaining</small></div></div>
       </aside>
 
